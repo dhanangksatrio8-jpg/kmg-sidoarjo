@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aplikasi KMG Jatimers - Cabang Sidoarjo</title>
+<style>
+  :root{
+    --navy:#0b2545; --navy2:#13315c; --gold:#c8a951; --gold-dark:#a9872f;
+    --bg:#f4f6fa; --card:#ffffff; --ink:#1c2733; --muted:#64748b;
+    --line:#e2e8f0; --green:#1a7f4b; --green-bg:#e7f6ee;
+    --amber:#a3670a; --amber-bg:#fdf2df; --red:#b3261e; --red-bg:#fbe9e8;
+    --blue:#1d4ed8; --blue-bg:#e8effe;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); color:var(--ink); font-size:14px;}
+  .app{max-width:1280px; margin:0 auto; padding:0 0 60px;}
+  header.top{background:linear-gradient(120deg,var(--navy),var(--navy2)); color:#fff; padding:18px 24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;}
+  header.top .brand{display:flex; align-items:center; gap:12px;}
+  header.top .brand .logo{width:40px; height:40px; border-radius:8px; background:var(--gold); display:flex; align-items:center; justify-content:center; font-weight:800; color:var(--navy); font-size:16px;}
+  header.top h1{font-size:17px; margin:0; letter-spacing:.2px;}
+  header.top p{margin:2px 0 0; font-size:12px; color:#cbd8f0;}
+  header.top .meta{font-size:11.5px; color:#cbd8f0; text-align:right; line-height:1.5;}
+  nav.tabs{display:flex; gap:4px; background:#fff; border-bottom:1px solid var(--line); padding:0 24px; overflow-x:auto;}
+  nav.tabs button{border:none; background:transparent; padding:14px 16px; font-size:13.5px; font-weight:600; color:var(--muted); cursor:pointer; border-bottom:3px solid transparent; white-space:nowrap;}
+  nav.tabs button.active{color:var(--navy); border-bottom-color:var(--gold);}
+  main{padding:22px 24px;}
+  .view{display:none;}
+  .view.active{display:block; animation:fade .18s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;}}
+
+  .grid{display:grid; gap:14px;}
+  .grid.cards{grid-template-columns:repeat(auto-fit,minmax(210px,1fr));}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:16px; box-shadow:0 1px 2px rgba(15,23,42,.04);}
+  .card h3{margin:0 0 4px; font-size:12px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.4px;}
+  .card .val{font-size:24px; font-weight:800; color:var(--navy); margin-top:4px;}
+  .card .sub{font-size:11.5px; color:var(--muted); margin-top:4px;}
+
+  .panel{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:18px; margin-bottom:16px;}
+  .panel h2{font-size:15px; margin:0 0 14px; color:var(--navy); display:flex; align-items:center; gap:8px;}
+  .panel h2 .n{background:var(--navy); color:#fff; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:11.5px;}
+
+  .bars{display:flex; flex-direction:column; gap:8px;}
+  .bar-row{display:grid; grid-template-columns:150px 1fr 46px; align-items:center; gap:10px; font-size:12.5px;}
+  .bar-track{background:#eef1f6; border-radius:6px; height:14px; overflow:hidden;}
+  .bar-fill{height:100%; border-radius:6px; background:linear-gradient(90deg,var(--navy),var(--gold));}
+
+  form .fieldset{border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px 6px; margin-bottom:14px;}
+  form .fieldset legend{font-size:12.5px; font-weight:700; color:var(--navy); padding:0 6px;}
+  .row{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px 14px;}
+  .field{margin-bottom:10px;}
+  .field label{display:block; font-size:11.5px; color:var(--muted); margin-bottom:4px; font-weight:600;}
+  .field input, .field select, .field textarea{width:100%; padding:8px 10px; border:1px solid #cbd5e1; border-radius:7px; font-size:13px; font-family:inherit; background:#fff;}
+  .field input:focus, .field select:focus, .field textarea:focus{outline:2px solid var(--gold); border-color:var(--gold);}
+  .field .hint{font-size:10.5px; color:var(--muted); margin-top:3px;}
+  .actions{display:flex; gap:10px; justify-content:flex-end; margin-top:6px;}
+  button.btn{border:none; padding:10px 18px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer;}
+  button.btn.primary{background:var(--navy); color:#fff;}
+  button.btn.primary:hover{background:var(--navy2);}
+  button.btn.gold{background:var(--gold); color:var(--navy);}
+  button.btn.ghost{background:#eef1f6; color:var(--ink);}
+  button.btn.danger{background:var(--red-bg); color:var(--red);}
+  button.btn:disabled{opacity:.5; cursor:not-allowed;}
+  button.btn.sm{padding:6px 10px; font-size:11.5px; border-radius:6px;}
+
+  .calc-preview{background:var(--blue-bg); border:1px dashed #93aefb; border-radius:var(--radius); padding:14px 16px; margin-top:4px;}
+  .calc-preview .grid.cards{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));}
+  .calc-preview .card{box-shadow:none; padding:10px 12px;}
+  .calc-preview .card .val{font-size:16px;}
+  .flag{display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700;}
+  .flag.ok{background:var(--green-bg); color:var(--green);}
+  .flag.bad{background:var(--red-bg); color:var(--red);}
+
+  .toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:12px; justify-content:space-between;}
+  .toolbar .left{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
+  input.search{padding:9px 12px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; min-width:220px;}
+  select.filter{padding:9px 10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px;}
+
+  table{width:100%; border-collapse:collapse; font-size:12.5px;}
+  thead th{text-align:left; background:#f1f4f9; color:var(--muted); font-weight:700; padding:9px 10px; border-bottom:1px solid var(--line); white-space:nowrap; position:sticky; top:0;}
+  tbody td{padding:9px 10px; border-bottom:1px solid var(--line); white-space:nowrap;}
+  tbody tr:hover{background:#fafbfe;}
+  .table-wrap{overflow:auto; max-height:560px; border:1px solid var(--line); border-radius:var(--radius);}
+  .status-pill{padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; display:inline-block;}
+  .status-PROSES{background:var(--amber-bg); color:var(--amber);}
+  .status-DISETUJUI{background:var(--blue-bg); color:var(--blue);}
+  .status-CAIR{background:var(--green-bg); color:var(--green);}
+  .status-DITOLAK{background:var(--red-bg); color:var(--red);}
+  .icon-btn{border:none; background:#eef1f6; padding:5px 8px; border-radius:6px; cursor:pointer; font-size:12px; margin-right:4px;}
+  .icon-btn:hover{background:#e2e8f0;}
+
+  .modal-overlay{position:fixed; inset:0; background:rgba(15,23,42,.5); display:none; align-items:center; justify-content:center; padding:20px; z-index:50;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:#fff; border-radius:12px; max-width:760px; width:100%; max-height:88vh; overflow:auto; padding:22px 24px;}
+  .modal h2{margin-top:0; color:var(--navy); font-size:16px;}
+  .close-x{float:right; border:none; background:none; font-size:18px; cursor:pointer; color:var(--muted);}
+  .detail-grid{display:grid; grid-template-columns:1fr 1fr; gap:6px 24px; font-size:12.5px; margin-top:10px;}
+  .detail-grid .k{color:var(--muted);}
+  .detail-grid .row2{display:flex; justify-content:space-between; border-bottom:1px dashed var(--line); padding:5px 0;}
+
+  .doc-page{background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:34px 40px; font-family:'Times New Roman',Times,serif; font-size:13.5px; line-height:1.65; color:#111; max-width:760px; margin:0 auto;}
+  .doc-page h3{text-align:center; margin:0 0 2px; font-size:15px; letter-spacing:.5px;}
+  .doc-page .doc-sub{text-align:center; font-size:11.5px; margin-bottom:14px;}
+  .doc-head{text-align:center; border-bottom:3px double #111; padding-bottom:10px; margin-bottom:18px;}
+  .doc-head .bankname{font-weight:800; font-size:16px;}
+  .doc-head .addr{font-size:11px;}
+  table.doc-table{width:100%; border-collapse:collapse; margin:10px 0;}
+  table.doc-table td{padding:3px 4px; vertical-align:top; font-size:13px;}
+  table.doc-table td.k{width:230px;}
+  .sign-block{display:flex; justify-content:space-between; margin-top:40px;}
+  .sign-block .box{text-align:center; width:230px; font-size:13px;}
+  .sign-space{height:60px;}
+
+  .banner{background:var(--green-bg); color:var(--green); border:1px solid #b8e6cc; padding:10px 14px; border-radius:8px; font-size:12.5px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;}
+  .warn-banner{background:var(--amber-bg); color:var(--amber); border:1px solid #f0d9a6; padding:10px 14px; border-radius:8px; font-size:12px; margin-bottom:14px;}
+  .empty{text-align:center; padding:40px 20px; color:var(--muted); font-size:13px;}
+  .shared-note{font-size:11px; color:var(--muted); margin-top:6px;}
+  @media print{
+    header.top, nav.tabs, .toolbar, .no-print{display:none !important;}
+    body{background:#fff;}
+    main{padding:0;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <div class="logo">BJ</div>
+      <div>
+        <h1>Aplikasi KMG Jatimers</h1>
+        <p>Kredit Multiguna &middot; Bank Jatim Cabang Sidoarjo</p>
+      </div>
+    </div>
+    <div class="meta">
+      <span id="storage-mode-badge">Memuat status penyimpanan...</span><br/>
+      <span id="clock"></span>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+    <button class="tab-btn" data-tab="input">Input Nasabah</button>
+    <button class="tab-btn" data-tab="data">Data Nasabah</button>
+    <button class="tab-btn" data-tab="dokumen">Generate Dokumen</button>
+    <button class="tab-btn" data-tab="pengaturan">Pengaturan</button>
+  </nav>
+
+  <main>
+
+    <!-- DASHBOARD -->
+    <section class="view active" id="view-dashboard">
+      <div id="dash-banner"></div>
+      <div class="grid cards" id="dash-cards" style="margin-bottom:16px;"></div>
+      <div class="grid" style="grid-template-columns:1.2fr .8fr;">
+        <div class="panel">
+          <h2><span class="n">1</span> Distribusi Status Permohonan</h2>
+          <div class="bars" id="dash-status-bars"></div>
+        </div>
+        <div class="panel">
+          <h2><span class="n">2</span> Instansi Terbanyak</h2>
+          <div class="bars" id="dash-instansi-bars"></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2><span class="n">3</span> Nasabah Terbaru</h2>
+        <div class="table-wrap" style="max-height:320px;">
+          <table>
+            <thead><tr><th>Nama</th><th>Jabatan</th><th>Instansi</th><th>Plafond</th><th>Status</th><th>Tgl Input</th></tr></thead>
+            <tbody id="dash-recent"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- INPUT -->
+    <section class="view" id="view-input">
+      <div class="panel">
+        <h2><span class="n">1</span> Formulir Input Nasabah Baru</h2>
+        <form id="form-nasabah">
+          <input type="hidden" id="f-id">
+          <fieldset class="fieldset">
+            <legend>Data Pribadi</legend>
+            <div class="row">
+              <div class="field"><label>Nama Lengkap (sesuai KTP)*</label><input required id="f-nama" placeholder="cth. AKHMAD QOSIM DARMAJI"></div>
+              <div class="field"><label>Jenis Kelamin*</label><select id="f-jk" required><option value="">Pilih</option><option>Laki-laki</option><option>Perempuan</option></select></div>
+              <div class="field"><label>Tempat Lahir</label><input id="f-tempat_lahir"></div>
+              <div class="field"><label>Tanggal Lahir*</label><input type="date" id="f-tgl_lahir" required></div>
+              <div class="field"><label>NIK</label><input id="f-nik" maxlength="16" placeholder="16 digit"></div>
+              <div class="field"><label>NPWP</label><input id="f-npwp"></div>
+              <div class="field"><label>No. HP Aktif</label><input id="f-hp"></div>
+              <div class="field"><label>Nama Ibu Kandung</label><input id="f-ibu"></div>
+              <div class="field"><label>Pendidikan Terakhir</label>
+                <select id="f-pendidikan"><option>SMA</option><option>D3</option><option>S1</option><option>S2</option><option>S3</option></select>
+              </div>
+              <div class="field"><label>Jumlah Tanggungan Keluarga</label><input id="f-tanggungan" type="number" min="0"></div>
+              <div class="field"><label>Nama Pasangan</label><input id="f-pasangan"></div>
+            </div>
+            <div class="row">
+              <div class="field" style="grid-column:1/-1"><label>Alamat Rumah</label><input id="f-alamat"></div>
+              <div class="field"><label>RT</label><input id="f-rt"></div>
+              <div class="field"><label>RW</label><input id="f-rw"></div>
+              <div class="field"><label>Kelurahan/Desa</label><input id="f-kelurahan"></div>
+              <div class="field"><label>Kecamatan</label><input id="f-kecamatan"></div>
+              <div class="field"><label>Kota/Kab</label><input id="f-kota" value="SIDOARJO"></div>
+            </div>
+          </fieldset>
+
+          <fieldset class="fieldset">
+            <legend>Data Pekerjaan</legend>
+            <div class="row">
+              <div class="field"><label>Status Jabatan*</label>
+                <select id="f-jabatan" required><option value="">Pilih jabatan</option></select>
+                <div class="hint">Menentukan RPC, usia pensiun, premi &amp; maks. jangka waktu</div>
+              </div>
+              <div class="field"><label>Instansi</label><input id="f-instansi" list="dl-instansi" placeholder="ketik untuk mencari..."></div>
+              <div class="field"><label>NIP</label><input id="f-nip"></div>
+              <div class="field"><label>TMT (Tgl Mulai Tugas/Kerja)</label><input type="date" id="f-tmt"></div>
+              <div class="field"><label>Jenis Permohonan*</label>
+                <select id="f-jenis" required><option>BARU</option><option>KOMPEN</option><option>TAKE OVER</option></select>
+              </div>
+              <div class="field"><label>Gaji Bersih (Rp)*</label><input type="number" id="f-gaji" required min="0"></div>
+            </div>
+          </fieldset>
+
+          <fieldset class="fieldset">
+            <legend>Permohonan Kredit</legend>
+            <div class="row">
+              <div class="field"><label>Tanggal Input*</label><input type="date" id="f-tanggal" required></div>
+              <div class="field"><label>Plafond Diminta (Rp)*</label><input type="number" id="f-plafond" required min="0"></div>
+              <div class="field"><label>Jangka Waktu Diminta (Bulan)*</label><input type="number" id="f-jkw" required min="1"></div>
+              <div class="field"><label>Analis</label><input id="f-analis" list="dl-nip"></div>
+              <div class="field"><label>Marketing</label><input id="f-marketing" list="dl-nip"></div>
+              <div class="field"><label>Status Permohonan</label>
+                <select id="f-status"><option>PROSES</option><option>DISETUJUI</option><option>CAIR</option><option>DITOLAK</option></select>
+              </div>
+            </div>
+            <div class="field"><label>Catatan</label><textarea id="f-catatan" rows="2"></textarea></div>
+          </fieldset>
+
+          <div class="calc-preview" id="calc-preview">
+            <strong style="font-size:12.5px; color:var(--navy);">Pratinjau Perhitungan Otomatis</strong>
+            <div class="grid cards" id="calc-cards" style="margin-top:10px;"></div>
+          </div>
+
+          <div class="actions">
+            <button type="button" class="btn ghost" id="btn-reset">Bersihkan Form</button>
+            <button type="submit" class="btn primary" id="btn-submit">Simpan Nasabah</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- DATA NASABAH -->
+    <section class="view" id="view-data">
+      <div class="panel">
+        <h2><span class="n">1</span> Monitoring &amp; Daftar Nasabah</h2>
+        <div class="toolbar">
+          <div class="left">
+            <input class="search" id="search-box" placeholder="Cari nama / NIP / instansi...">
+            <select class="filter" id="filter-status">
+              <option value="">Semua Status</option>
+              <option>PROSES</option><option>DISETUJUI</option><option>CAIR</option><option>DITOLAK</option>
+            </select>
+            <select class="filter" id="filter-jabatan"><option value="">Semua Jabatan</option></select>
+          </div>
+          <div class="left">
+            <button class="btn ghost sm" id="btn-export">Unduh CSV</button>
+            <span class="shared-note" id="count-note"></span>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>No</th><th>Nama</th><th>Jabatan</th><th>Instansi</th><th>Gaji Bersih</th>
+              <th>Plafond Diminta</th><th>Maks Plafond</th><th>Jk Waktu</th><th>Angsuran/bln</th>
+              <th>Status</th><th>Analis</th><th>Aksi</th>
+            </tr></thead>
+            <tbody id="data-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- DOKUMEN -->
+    <section class="view" id="view-dokumen">
+      <div class="panel no-print">
+        <h2><span class="n">1</span> Generate Dokumen Kredit</h2>
+        <div class="row">
+          <div class="field"><label>Pilih Nasabah</label><select id="doc-nasabah"><option value="">-- pilih nasabah --</option></select></div>
+          <div class="field"><label>Jenis Dokumen</label>
+            <select id="doc-jenis">
+              <option value="sppk">SPPK - Surat Penegasan Persetujuan Kredit</option>
+              <option value="kuasa">Surat Kuasa Memotong Gaji/Angsuran</option>
+              <option value="pernyataan">Surat Pernyataan Pemohon</option>
+              <option value="memo">Memo Pencairan Kredit</option>
+            </select>
+          </div>
+        </div>
+        <div class="actions" style="justify-content:flex-start;">
+          <button class="btn primary" id="btn-gen-doc">Buat Dokumen</button>
+          <button class="btn gold" id="btn-print-doc" disabled>Cetak / Simpan PDF</button>
+        </div>
+      </div>
+      <div id="doc-output"></div>
+    </section>
+
+    <!-- PENGATURAN -->
+    <section class="view" id="view-pengaturan">
+      <div class="panel">
+        <h2><span class="n">1</span> Pejabat Penandatangan</h2>
+        <div class="row">
+          <div class="field"><label>Nama Pemimpin Cabang</label><input id="s-pinca-nama"></div>
+          <div class="field"><label>Jabatan Penandatangan</label><input id="s-pinca-jabatan"></div>
+          <div class="field"><label>Nama Analis Default</label><input id="s-analis-default"></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2><span class="n">2</span> Parameter Kredit Default</h2>
+        <div class="row">
+          <div class="field"><label>Suku Bunga Flat (% per tahun)</label><input type="number" step="0.01" id="s-suku-bunga"></div>
+          <div class="field"><label>% Biaya Provisi Reguler</label><input type="number" step="0.01" id="s-provisi"></div>
+        </div>
+        <p class="hint" style="color:var(--muted); font-size:11.5px;">
+          Parameter ini dipakai untuk menghitung estimasi maksimal plafond dan angsuran otomatis.
+          Selalu verifikasi ulang terhadap SK suku bunga / tabel resmi Bank Jatim yang berlaku saat pengajuan â€” jangan jadikan angka di sini sebagai keputusan final.
+        </p>
+        <div class="actions"><button class="btn primary" id="btn-save-settings">Simpan Pengaturan</button></div>
+      </div>
+      <div class="panel">
+        <h2><span class="n">3</span> Tentang Data</h2>
+        <p style="font-size:12.5px; color:var(--muted); line-height:1.7;">
+          Aplikasi ini menyederhanakan alur kerja file Excel "APLIKASI KMG JATIMERS SIDOARJO" (31 sheet) menjadi satu alat input, monitoring,
+          dan generate dokumen. Data disimpan sebagai <em>shared storage</em> pada artifact ini sehingga siapa pun yang membuka link/artifact
+          yang sama akan melihat &amp; bisa mengedit data yang sama secara real-time (last write wins). 39 data nasabah awal dari file Excel
+          sudah dimuat otomatis saat pertama kali dibuka.
+        </p>
+        <div class="actions"><button class="btn danger" id="btn-reset-data">Reset ke Data Awal (39 nasabah)</button></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<datalist id="dl-instansi"></datalist>
+<datalist id="dl-nip"></datalist>
+
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal">
+    <button class="close-x" id="close-modal">&times;</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+/* ============ EMBEDDED REFERENCE DATA (from original Excel workbook) ============ */
+const SEED_RECORDS = [{"id": "seed-9cf69dcdd6", "nama": "AKHMAD QOSIM DARMAJI", "jk": "Laki-laki", "tempat_lahir": "SIDOARJO", "tgl_lahir": "1964-07-06", "nik": "3515070607640002", "npwp": "57.391.581.6-617.000", "hp": "085101409225", "ibu": "QUMAIYAH", "pendidikan": "S1", "tanggungan": "", "pasangan": "UMI SALAMAH", "alamat": "SIDOARJO", "rt": "001", "rw": "004", "kelurahan": "KEDUNGPELUK", "kecamatan": "CANDI", "kota": "SIDOARJO", "jabatan": "PENSIUNAN USAHA", "instansi": "PENSIUNAN", "nip": "196407061992031008", "tmt": "1992-06-29", "jenis": "KOMPEN", "gaji": 4378000, "tanggal": "2023-07-21", "plafond": 350000000, "jkw": 168, "analis": "DHIMAS PERDHITA", "marketing": "", "status": "PROSES", "catatan": "SK PENSIUNAN 00226/23515/AZ/05/22", "no_rekening": "0262027666", "createdAt": "2023-07-21T00:00:00.000Z"}, {"id": "seed-8f78a4b1f1", "nama": "SAREN", "jk": "Laki-laki", "tempat_lahir": "PURWOREJO", "tgl_lahir": "1963-02-05", "nik": "3515080502630005", "npwp": "59.838.336.2.617.000", "hp": "081335571003", "ibu": "TURAH", "pendidikan": "SMA", "tanggungan": "", "pasangan": "WAGIRAH", "alamat": "SIDOARJO", "rt": "014", "rw": "004", "kelurahan": "SUKO", "kecamatan": "SIDOARJO", "kota": "SIDOARJO", "jabatan": "PENSIUNAN", "instansi": "PENSIUNAN", "nip": "196302051989031018", "tmt": "1991-02-28", "jenis": "KOMPEN", "gaji": 3540400, "tanggal": "2023-07-21", "plafond": 213500000, "jkw": 156, "analis": "DHIMAS PERDHITA", "marketing": "", "status": "PROSES", "catatan": "SK PENSIUNAN 00741/23515/AZ/12/20", "no_rekening": "0262196755", "createdAt": "2023-07-21T00:00:00.000Z"}, {"id": "seed-4e1de2878d", "nama": "FRIDA AYU YULIANA ", "jk": "", "tempat_lahir": "SIDOARJO", "tgl_lahir": "1994-07-08", "nik": "3515154807940003", "npwp": "", "hp": "085732616863", "ibu": "BINTANG NUR HARIYATI", "pendidikan": "D-III", "tanggungan": "", "pasangan": "MUHAMMAD NAUFAL HAQS PD", "alamat": "SIDOARJO", "rt": "006", "rw": "002", "kelurahan": "SIDOMULYO ", "kecamatan": "BUDURAN ", "kota": "SIDOARJO", "jabatan": "PNS58", "instansi": "RSUD SDA (PNS)", "nip": "199407082019032021", "tmt": "2020-02-26", "jenis": "BARU", "gaji": 2422000, "tanggal": "2023-07-21", "plafond": 100000000, "jkw": 60, "analis": "DHIMAS PERDHITA", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0267633126", "createdAt": "2023-07-21T00:00:00.000Z"}, {"id": "seed-34db8883c0", "nama": "SUBANDI", "jk": "Laki-laki", "tempat_lahir": "SIDOARJO", "tgl_lahir": "1967-06-09", "nik": "3515090906670001", "npwp": "98.058.144.1-603.000", "hp": "089677465122", "ibu": "KARSIH", "pendidikan": "SMP", "tanggungan": "", "pasangan": "WIWIK", "alamat": "SIDOARJO", "rt": "005", "rw": "002", "kelurahan": "KEPADANGAN", "kecamatan": "TULANGAN", "kota": "SIDOARJO", "jabatan": "PRAPEN58", "instansi": "DINAS KEBERSIHAN", "nip": "196706092007011014", "tmt": "2008-11-17", "jenis": "KOMPEN", "gaji": 3200000, "tanggal": "2023-07-26", "plafond": 90000000, "jkw": 120, "analis": "SAFITRI INDRAYANTI", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0262798437", "createdAt": "2023-07-26T00:00:00.000Z"}, {"id": "seed-a861236e11", "nama": "TRI WAHYUNINGSIH", "jk": "", "tempat_lahir": "JAKARTA", "tgl_lahir": "1980-09-12", "nik": "3515175209800004", "npwp": "59.818.952.0-643.000", "hp": "081235876153", "ibu": "MANISEM", "pendidikan": "D-III", "tanggungan": "", "pasangan": "FIDELLA AULIA PUTRI", "alamat": "SIDOARJO", "rt": "017", "rw": "008", "kelurahan": "SEDATIGEDE", "kecamatan": "SEDATI", "kota": "SIDOARJO", "jabatan": "PNS58", "instansi": "RSUD SDA (PNS)", "nip": "198009122009022006", "tmt": "2010-12-17", "jenis": "KOMPEN", "gaji": 3600000, "tanggal": "2023-07-26", "plafond": 230000000, "jkw": 180, "analis": "SAFITRI INDRAYANTI", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0262818390", "createdAt": "2023-07-26T00:00:00.000Z"}, {"id": "seed-166c3c8b5d", "nama": "MISDI", "jk": "Laki-laki", "tempat_lahir": "SIDOARJO", "tgl_lahir": "1967-03-18", "nik": "3515081803670004", "npwp": "98.058.160.7-617.000", "hp": "089685380209", "ibu": "SUTIANAH", "pendidikan": "SD", "tanggungan": "", "pasangan": "BAWON SUKESIH", "alamat": "SIDOARJO", "rt": "030", "rw": "006", "kelurahan": "SIDOKUMPUL", "kecamatan": "SIDOARJO", "kota": "SIDOARJO", "jabatan": "PRAPEN58", "instansi": "DINAS KEBERSIHAN", "nip": "196703182007011010", "tmt": "2008-11-17", "jenis": "BARU", "gaji": 2000000, "tanggal": "2023-07-26", "plafond": 89000000, "jkw": 120, "analis": "SAFITRI INDRAYANTI", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0262798429", "createdAt": "2023-07-26T00:00:00.000Z"}, {"id": "seed-c8b0893ba3", "nama": "H. USMAN, M.KES", "jk": "Laki-laki", "tempat_lahir": "SUMENEP", "tgl_lahir": "1963-08-18", "nik": "3515171808630002", "npwp": "07.102.940.9-643.000", "hp": "", "ibu": "SITI AISYAH", "pendidikan": "S2", "tanggungan": "", "pasangan": "WINDA LESTARI", "alamat": "SIDOARJO", "rt": "001", "rw": "001", "kelurahan": "BUNCITAN", "kecamatan": "SEDATI", "kota": "SIDOARJO", "jabatan": "ANGGOTA LEGISLATIF", "instansi": "DPRD (ANGOTA DEWAN)", "nip": "", "tmt": "2019-09-16", "jenis": "KOMPEN", "gaji": 106618573, "tanggal": "2023-07-26", "plafond": 250000000, "jkw": 12, "analis": "SAFITRI INDRAYANTI", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0262077855", "createdAt": "2023-07-26T00:00:00.000Z"}, {"id": "seed-33b3036430", "nama": "IMROATUL INASYAH", "jk": "", "tempat_lahir": "SIDOARJO", "tgl_lahir": "1988-05-21", "nik": "3515086105880003", "npwp": "79.761.506.9-617.000", "hp": "081332774184", "ibu": "KHOIRIYAH", "pendidikan": "S1", "tanggungan": "", "pasangan": "EDI HERMAN SANTOSO", "alamat": "SIDOARJO", "rt": "006", "rw": "003", "kelurahan": "SIDODADI", "kecamatan": "CANDI", "kota": "SIDOARJO", "jabatan": "PNS58", "instansi": "DIKBUD SIDOARJO", "nip": "198805212020122014", "tmt": "2022-11-18", "jenis": "BARU", "gaji": 1810950, "tanggal": "2023-07-27", "plafond": 50000000, "jkw": 36, "analis": "DHIMAS PERDHITA", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0267753504", "createdAt": "2023-07-27T00:00:00.000Z"}, {"id": "seed-accda0c9b1", "nama": "RIA KURNIASARI", "jk": "", "tempat_lahir": "SURABAYA", "tgl_lahir": "1981-05-25", "nik": "3515166505810006", "npwp": "36.011.988.7-643.000", "hp": "081332183681", "ibu": "HJ. SUJATI", "pendidikan": "S1", "tanggungan": "", "pasangan": "ENDRA ARIES SETIAWAN", "alamat": "DS PUNGGUL", "rt": "003", "rw": "001", "kelurahan": "PUNGGUL", "kecamatan": "GEDANGAN", "kota": "SIDOARJO", "jabatan": "PNS58", "instansi": "SMPN 5 SDA", "nip": "198105252009022006", "tmt": "2010-12-17", "jenis": "BARU", "gaji": 3297500, "tanggal": "2023-07-31", "plafond": 274000000, "jkw": 180, "analis": "SAFITRI INDRAYANTI", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0262312071", "createdAt": "2023-07-31T00:00:00.000Z"}, {"id": "seed-6f5032e3ed", "nama": "AHMAD AHSAN", "jk": "Laki-laki", "tempat_lahir": "SIDOARJO", "tgl_lahir": "2016-05-18", "nik": "3515170401970001", "npwp": "86.199.906.8-643.000", "hp": "085156772504", "ibu": "HIDAYAH", "pendidikan": "SMK", "tanggungan": "", "pasangan": "SULTON", "alamat": "JL MALIK IBRAHIM", "rt": "006", "rw": "003", "kelurahan": "KWANGSAN", "kecamatan": "SEDATI", "kota": "SIDOARJO", "jabatan": "BLUD NON ASN TETAP", "instansi": "RSUD SDA (NON PNS) BLUD", "nip": "23019712191", "tmt": "2021-07-30", "jenis": "BARU", "gaji": 1016000, "tanggal": "2023-07-28", "plafond": 25000000, "jkw": 36, "analis": "SAFITRI INDRAYANTI", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0263212363", "createdAt": "2023-07-28T00:00:00.000Z"}, {"id": "seed-ebcb84c204", "nama": "MAULIDIYATUL FITRIYA", "jk": "", "tempat_lahir": "SIDOARJO", "tgl_lahir": "1997-07-23", "nik": "3515036307970003", "npwp": "93.681.534.9-603.000", "hp": "081259019997", "ibu": "TIAYAH", "pendidikan": "SMK", "tanggungan": "", "pasangan": "ROIS AL BASYAR", "alamat": "REJENI", "rt": "007", "rw": "004", "kelurahan": "REJENI", "kecamatan": "KREMBUNG", "kota": "SIDOARJO", "jabatan": "BLUD NON ASN TETAP", "instansi": "RSUD SDA (NON PNS) BLUD", "nip": "23079712192", "tmt": "2021-04-30", "jenis": "KOMPEN", "gaji": 2200000, "tanggal": "2023-08-01", "plafond": 120000000, "jkw": 120, "analis": "SAFITRI INDRAYANTI", "marketing": "", "status": "PROSES", "catatan": "DN-05 MK 0151215", "no_rekening": "0263211685", "createdAt": "2023-08-01T00:00:00.000Z"}, {"id": "seed-8f5479f600", "nama": "TEDY RYZKY IRAWAN", "jk": "Laki-laki", "tempat_lahir": "SIDOARJO", "tgl_lahir": "1969-07-07", "nik": "3515080707690010", "npwp": "96.144.615.0-617.000", "hp": "", "ibu": "FATHUL", "pendidikan": "SPP", "tanggungan": "", "pasangan": "SITI M", "alamat": "JETIS 1 NO. 57 B LEMAHPUTRO", "rt": "011", "rw": "003", "kelurahan": "LEMAHPUTRO", "kecamatan": "SIDOARJO", "kota": "SIDOARJO", "jabatan": "P3K", "instansi": "PERTANIAN DAN PERKEBUNAN", "nip": "196907072021211001", "tmt": "2021-01-04", "jenis": "BARU", "gaji": 2631463, "tanggal": "2023-08-02", "plafond": 40000000, "jkw": 24, "analis": "SAFITRI INDRAYANTI", "marketing": "", "status": "PROSES", "catatan": "ML/NAK/02738/89", "no_rekening": "0262939537", "createdAt": "2023-08-02T00:00:00.000Z"}, {"id": "seed-e01c27c114", "nama": "SLAMET HARIYONO", "jk": "Laki-laki", "tempat_lahir": "SIDOARJO", "tgl_lahir": "1970-12-05", "nik": "3515080512700004", "npwp": "48.532.210.1-617.000", "hp": "081554499356", "ibu": "RIATI", "pendidikan": "SMP", "tanggungan": "", "pasangan": "SITI MUTHOHAROH", "alamat": "SLAUTAN GG KEL ", "rt": "014", "rw": "003", "kelurahan": "SIDOKUMPUL", "kecamatan": "SIDOARJO", "kota": "SIDOARJO", "jabatan": "PNS58", "instansi": "DIKBUD SIDOARJO", "nip": "197012052000101001", "tmt": "2002-08-30", "jenis": "KOMPEN", "gaji": 2780000, "tanggal": "2023-08-02", "plafond": 100000000, "jkw": 60, "analis": "SAFITRI INDRAYANTI", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0262627411", "createdAt": "2023-08-02T00:00:00.000Z"}, {"id": "seed-73d557fab8", "nama": "RIRIN BUDIARTI SP", "jk": "", "tempat_lahir": "SURABAYA", "tgl_lahir": "1971-03-24", "nik": "3515086403710002", "npwp": "57.188.630.8-617.000", "hp": "08123291536", "ibu": "SUMANDIYAH", "pendidikan": "S2", "tanggungan": "", "pasangan": "YUWONO", "alamat": "TAMAN PINANG INDAH BB 1/26", "rt": "019", "rw": "007", "kelurahan": "BANJARBENDO", "kecamatan": "SIDOARJO", "kota": "SIDOARJO", "jabatan": "PNS58", "instansi": "PERTANIAN DAN PERKEBUNAN", "nip": "1971032419997032005", "tmt": "1998-08-06", "jenis": "KOMPEN", "gaji": 5100000, "tanggal": "2023-08-03", "plafond": 231000000, "jkw": 66, "analis": "SAFITRI INDRAYANTI", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0262145633", "createdAt": "2023-08-03T00:00:00.000Z"}, {"id": "seed-b516d02c3b", "nama": "JONI HADI PRASETYO", "jk": "Laki-laki", "tempat_lahir": "BOJONEGORO", "tgl_lahir": "1960-06-30", "nik": "3515073006600002", "npwp": "24.439.494.6-617.000", "hp": "081334375086", "ibu": "MIKATIN", "pendidikan": "S1", "tanggungan": "", "pasangan": "MUATI", "alamat": "PERUM GRIYA NIRWANA BLOK DI-15", "rt": "002", "rw": "016", "kelurahan": "SUMORAME", "kecamatan": "CANDI", "kota": "SIDOARJO", "jabatan": "PENSIUNAN", "instansi": "PENSIUNAN", "nip": "196006301985041001", "tmt": "2012-10-01", "jenis": "KOMPEN", "gaji": 4200000, "tanggal": "2023-08-04", "plafond": 55000000, "jkw": 36, "analis": "SAFITRI INDRAYANTI", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0262872271", "createdAt": "2023-08-04T00:00:00.000Z"}, {"id": "seed-5f23c89e73", "nama": "MARISA FITRIANI", "jk": "", "tempat_lahir": "MADIUN", "tgl_lahir": "1994-03-15", "nik": "3519095503940002", "npwp": "72.994.689.7-621.000", "hp": "085655990870", "ibu": "LAMIYATUN", "pendidikan": "S1", "tanggungan": "", "pasangan": "SYAHRUL JADMIKA WIGNYA", "alamat": "SIDOMULYO", "rt": "007", "rw": "002", "kelurahan": "SIDOMULYO ", "kecamatan": "SAWAHAN", "kota": "MADIUN", "jabatan": "PNS58", "instansi": "BADAN KEPEGAWAIAN DAERAH", "nip": "199403152019032019", "tmt": "2020-02-28", "jenis": "BARU", "gaji": 1527000, "tanggal": "2023-08-07", "plafond": 70000000, "jkw": 72, "analis": "SAFITRI INDRAYANTI", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0262642194", "createdAt": "2023-08-07T00:00:00.000Z"}, {"id": "seed-8fa0e42bfb", "nama": "ULIN AGUSTIN", "jk": "", "tempat_lahir": "SIDOARJO", "tgl_lahir": "1977-08-21", "nik": "3515086108770005", "npwp": "89.024.051.8-617.000", "hp": "085733097000", "ibu": "SUMINTARTI", "pendidikan": "SMA", "tanggungan": "", "pasangan": "ANANG SULISTIJANTO", "alamat": "MAGERSARI 2/19", "rt": "003", "rw": "001", "kelurahan": "MAGERSARI", "kecamatan": "SIDOARJO", "kota": "SIDOARJO", "jabatan": "PNS58", "instansi": "RSUD SDA (PNS)", "nip": "197708212009022001", "tmt": "2009-06-21", "jenis": "KOMPEN", "gaji": 2797000, "tanggal": "2023-08-11", "plafond": 200000000, "jkw": 143, "analis": "SAFITRI INDRAYANTI", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0262545466", "createdAt": "2023-08-11T00:00:00.000Z"}, {"id": "seed-3f52b2f9bf", "nama": "DURITA ARDARANI", "jk": "", "tempat_lahir": "SURABAYA", "tgl_lahir": "1990-12-21", "nik": "3578066112900003", "npwp": "67.323.866.3-614.000", "hp": "0822213000491", "ibu": "KARSIMU", "pendidikan": "DIII", "tanggungan": "", "pasangan": "DECKY TOMY WIJAYA", "alamat": "PURI GUNUNGANYAR REGENCY BLOK F/11", "rt": "002", "rw": "007", "kelurahan": "GUNUNG ANYAR TAMBAK", "kecamatan": "GUNUNG ANYAR", "kota": "SURABAYA", "jabatan": "PNS58", "instansi": "DISPENDA PEMDA SDA", "nip": "199012212020122014", "tmt": "2022-11-18", "jenis": "BARU", "gaji": 2500000, "tanggal": "2023-08-15", "plafond": 25000000, "jkw": 48, "analis": "SAFITRI INDRAYANTI", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0752049254", "createdAt": "2023-08-15T00:00:00.000Z"}, {"id": "seed-3e1dee3160", "nama": "HERI SISWOKO", "jk": "Laki-laki", "tempat_lahir": "KEDIRI", "tgl_lahir": "1965-04-04", "nik": "3506170404650001", "npwp": "14.399.999.3-655.000", "hp": "08123438291", "ibu": "SOEYATIN", "pendidikan": "S1", "tanggungan": "", "pasangan": "NURLAILATUS SOLICHAH", "alamat": "JL KALITENGAH LAPANGAN", "rt": "003", "rw": "002", "kelurahan": "KALITENGAH", "kecamatan": "TANGGULANGIN", "kota": "SIDOARJO", "jabatan": "PENSIUNAN", "instansi": "PENSIUNAN ASABRI", "nip": "65040152", "tmt": "1985-10-29", "jenis": "BARU", "gaji": 4324400, "tanggal": "2023-08-16", "plafond": 100000000, "jkw": 96, "analis": "SAFITRI INDRAYANTI", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "1723030290", "createdAt": "2023-08-16T00:00:00.000Z"}, {"id": "seed-43366f0483", "nama": "NANIK HIDAYTAI", "jk": "", "tempat_lahir": "BOJONEGORO", "tgl_lahir": "1966-11-24", "nik": "3515086411660003", "npwp": "", "hp": "", "ibu": "", "pendidikan": "S1", "tanggungan": "", "pasangan": "", "alamat": "BLURU PERMAI CI-26", "rt": "007", "rw": "011", "kelurahan": "BLURU KIDUL", "kecamatan": "BLURU KIDUL", "kota": "SIDOARJO", "jabatan": "PNS58", "instansi": "SMPN 5 SDA", "nip": "196611241989032003", "tmt": "1990-04-30", "jenis": "KOMPEN", "gaji": 4800000, "tanggal": "2023-08-16", "plafond": 120000000, "jkw": 36, "analis": "NIP TIDAK DITEMUKAN", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "", "createdAt": "2023-08-16T00:00:00.000Z"}, {"id": "seed-a08f2df201", "nama": "ABD ROHMAN", "jk": "", "tempat_lahir": "SIDOARJO", "tgl_lahir": "1964-07-22", "nik": "3515072207640001", "npwp": "", "hp": "089512471834", "ibu": "SUKARTI", "pendidikan": "SMA", "tanggungan": "", "pasangan": "ISTIROCHAH", "alamat": "JL. SUNAN MURIA ", "rt": "002", "rw": "001", "kelurahan": "SUGIHWARAS", "kecamatan": "CANDI", "kota": "SIDOARJO", "jabatan": "PENSIUNAN", "instansi": "PENSIUNAN", "nip": "196407222008011001", "tmt": "2006-08-01", "jenis": "KOMPEN", "gaji": 1827400, "tanggal": "2023-08-25", "plafond": 95000000, "jkw": 120, "analis": "SAFITRI INDRAYANTI", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0262933580", "createdAt": "2023-08-25T00:00:00.000Z"}, {"id": "seed-c6ced3c14c", "nama": "DJAMAL PATTY", "jk": "Laki-laki", "tempat_lahir": "SIRI SORI ISLAM", "tgl_lahir": "1960-04-09", "nik": "3515080904600001", "npwp": "48.531.976.8-617.000", "hp": "085717903349", "ibu": "HALIMA", "pendidikan": "S1", "tanggungan": "", "pasangan": "YUNITA NURMALA", "alamat": "PERUM KING SAFIRA RESIDENCE D1 NO 16", "rt": "043", "rw": "011", "kelurahan": "SEPANDE", "kecamatan": "CANDI", "kota": "SIDOARJO", "jabatan": "PENSIUNAN", "instansi": "PENSIUNAN", "nip": "196004091992031007", "tmt": "1992-03-10", "jenis": "KOMPEN", "gaji": 4028700, "tanggal": "2023-09-04", "plafond": 150000000, "jkw": 96, "analis": "ARNITYASARI IKAPUTRI", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0262247406", "createdAt": "2023-09-04T00:00:00.000Z"}, {"id": "seed-d97768d063", "nama": "AHMAD HASAN AL MUSLIM", "jk": "Laki-laki", "tempat_lahir": "SIDOARJO", "tgl_lahir": "1971-10-23", "nik": "3515172310710002", "npwp": "25.493.566.1-643.000", "hp": "08983662358", "ibu": "DEWI MUNIFAH", "pendidikan": "S1", "tanggungan": "", "pasangan": "MAUDIIR ROHMAH", "alamat": "JL KH ABU SUFYAN TENGAH", "rt": "012", "rw": "003", "kelurahan": "KALANGANYAR", "kecamatan": "SEDATI", "kota": "SIDOARJO", "jabatan": "PNS58", "instansi": "PDK CANDI", "nip": "197110232007011014", "tmt": "2007-10-01", "jenis": "BARU", "gaji": 1114248, "tanggal": "2023-09-05", "plafond": 45000000, "jkw": 72, "analis": "ARNITYASARI IKAPUTRI", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0262913601", "createdAt": "2023-09-05T00:00:00.000Z"}, {"id": "seed-ea0cff9a68", "nama": "NANIK INDARWATI", "jk": "", "tempat_lahir": "SIDOARJO", "tgl_lahir": "1979-05-31", "nik": "3515097105790001", "npwp": "46.981.486.7-603.000", "hp": "082140959526", "ibu": "WINARTI", "pendidikan": "S1", "tanggungan": "", "pasangan": "WAHYUDI", "alamat": "GELANG", "rt": "004", "rw": "001", "kelurahan": "GELANG", "kecamatan": "TULANGAN", "kota": "SIDOARJO", "jabatan": "PNS58", "instansi": "DINAS KESEHATAN", "nip": "197905312010012001", "tmt": "2011-12-01", "jenis": "KOMPEN", "gaji": 3030562, "tanggal": "2023-09-06", "plafond": 238000000, "jkw": 161, "analis": "ARNITYASARI IKAPUTRI", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0262633713", "createdAt": "2023-09-06T00:00:00.000Z"}, {"id": "seed-bfb1f801aa", "nama": "SUKESI", "jk": "", "tempat_lahir": "SIDOARJO", "tgl_lahir": "1958-12-12", "nik": "3515125212580003", "npwp": "78.960.788.4-603.000", "hp": "085648314757", "ibu": "MARNI", "pendidikan": "S1", "tanggungan": "", "pasangan": "MINANTA", "alamat": "KENDAL", "rt": "021", "rw": "003", "kelurahan": "BAKUNG PRINGGODANI", "kecamatan": "BALONGBENDO", "kota": "SIDOARJO", "jabatan": "PENSIUNAN", "instansi": "PENSIUNAN", "nip": "195812121980102004", "tmt": "", "jenis": "BARU", "gaji": 4536700, "tanggal": "2023-09-07", "plafond": 100000000, "jkw": 60, "analis": "DEVI MEILINA", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0262817377", "createdAt": "2023-09-07T00:00:00.000Z"}, {"id": "seed-9a9acaaaf3", "nama": "DRS M AHSAN ISNAINI", "jk": "Laki-laki", "tempat_lahir": "TARAKAN", "tgl_lahir": "1964-09-28", "nik": "3515142809640001", "npwp": "34.389.878.9-603.000", "hp": "087852266818", "ibu": "MASMURAH", "pendidikan": "S2", "tanggungan": "", "pasangan": "SITI ZULAIKAH", "alamat": "KEBONAGUNG", "rt": "020", "rw": "006", "kelurahan": "KEBONAGUNG", "kecamatan": "SUKODONO", "kota": "SIDOARJO", "jabatan": "PRAPEN60", "instansi": "CAB. DINAS P&K SDA", "nip": "196409282006041005", "tmt": "2006-04-01", "jenis": "KOMPEN", "gaji": 2498046, "tanggal": "2023-09-07", "plafond": 50000000, "jkw": 36, "analis": "DEVI MEILINA", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0262261531", "createdAt": "2023-09-07T00:00:00.000Z"}, {"id": "seed-b9637ddae6", "nama": "ASMUNIF", "jk": "Laki-laki", "tempat_lahir": "SIDOARJO", "tgl_lahir": "1971-09-09", "nik": "3515070909710003", "npwp": "73.026.554.3-617.000", "hp": "081216553808", "ibu": "MUNYATI", "pendidikan": "SMA", "tanggungan": "", "pasangan": "UMI HANIK", "alamat": "GELAM", "rt": "010", "rw": "003", "kelurahan": "GELAM", "kecamatan": "CANDI", "kota": "SIDOARJO", "jabatan": "PNS58", "instansi": "KEC CANDI", "nip": "197109092007011014", "tmt": "2019-04-01", "jenis": "BARU", "gaji": 4287179, "tanggal": "2023-09-08", "plafond": 200000000, "jkw": 71, "analis": "DEVI MEILINA", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0262805204", "createdAt": "2023-09-08T00:00:00.000Z"}, {"id": "seed-c14fd02e8b", "nama": "SUPRIYATI", "jk": "", "tempat_lahir": "SURABAYA", "tgl_lahir": "1969-07-26", "nik": "3527076607690001", "npwp": "49.163.425.9-644.000", "hp": "081333852348", "ibu": "KUSUS MAONAH", "pendidikan": "S1", "tanggungan": "", "pasangan": "SUPENO", "alamat": "JL BECIRO GG MELATI BLOK D5", "rt": "001", "rw": "002", "kelurahan": "JUMPUTREJO", "kecamatan": "SUKODONO", "kota": "SIDOARJO", "jabatan": "PRAPEN58 USAHA", "instansi": "DINAS KESEHATAN", "nip": "196907261990012001", "tmt": "1990-01-20", "jenis": "KOMPEN", "gaji": 4019482, "tanggal": "2023-09-08", "plafond": 280000000, "jkw": 180, "analis": "ERLITA FEBRIANA", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0262112063", "createdAt": "2023-09-08T00:00:00.000Z"}, {"id": "seed-455874bf5d", "nama": "NUR AINI", "jk": "", "tempat_lahir": "SIDOARJO", "tgl_lahir": "1979-04-14", "nik": "3515045404790001", "npwp": "", "hp": "081553750756", "ibu": "ZUBAIDAH", "pendidikan": "DIII", "tanggungan": "", "pasangan": "MUSIONO ADI CRISTANTO", "alamat": "PERUM ISTANA MEGA ASRI", "rt": "029", "rw": "001", "kelurahan": "SUMOKALI", "kecamatan": "CANDI", "kota": "SIDOARJO", "jabatan": "PNS58", "instansi": "DINAS KESEHATAN", "nip": "197904142008012027", "tmt": "2019-10-01", "jenis": "BARU", "gaji": 3296686, "tanggal": "2023-09-08", "plafond": 138000000, "jkw": 60, "analis": "DEVI MEILINA", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0262828140", "createdAt": "2023-09-08T00:00:00.000Z"}, {"id": "seed-ca8a1b08a6", "nama": "USFURIYAH", "jk": "", "tempat_lahir": "SIDOARJO", "tgl_lahir": "1967-04-13", "nik": "3515065304670001", "npwp": "78.586.537.9-617.000", "hp": "085101828149", "ibu": "HUSNAH", "pendidikan": "S1", "tanggungan": "", "pasangan": "MAT ARIF", "alamat": "KAHURIPAN NIRWANA VILLAGE BA 3/15", "rt": "005", "rw": "006", "kelurahan": "SUMPUT", "kecamatan": "SIDOARJO", "kota": "SIDOARJO", "jabatan": "PNS60", "instansi": "DIKBUD SIDOARJO", "nip": "196704132000122002", "tmt": "2002-08-30", "jenis": "BARU", "gaji": 3352071, "tanggal": "2023-09-12", "plafond": 106000000, "jkw": 42, "analis": "DEVI MEILINA", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0732000216", "createdAt": "2023-09-12T00:00:00.000Z"}, {"id": "seed-aac7c885d5", "nama": "SYAICHUR ROFIQ", "jk": "Laki-laki", "tempat_lahir": "SIDOARJO", "tgl_lahir": "1979-08-24", "nik": "3515082608790005", "npwp": "74.029.687.6-617.000", "hp": "085934968380", "ibu": "RAMINAH", "pendidikan": "S1", "tanggungan": "", "pasangan": "DEWI RAHAYU", "alamat": "KAHURIPAN NIRWANA CA-3/01", "rt": "003", "rw": "007", "kelurahan": "SUMPUT", "kecamatan": "SIDOARJO", "kota": "SIDOARJO", "jabatan": "TPP", "instansi": "PERPUSTAKAAN", "nip": "197908242014071001", "tmt": "2015-09-09", "jenis": "BARU", "gaji": 2300000, "tanggal": "2023-09-19", "plafond": 15000000, "jkw": 10, "analis": "ARNITYASARI IKAPUTRI", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0263402120", "createdAt": "2023-09-19T00:00:00.000Z"}, {"id": "seed-5a8b845b88", "nama": "DANI FATUL KHOIRIYA", "jk": "", "tempat_lahir": "SIDOARJO", "tgl_lahir": "1994-11-28", "nik": "3515086811940001", "npwp": "72.748.534.4-617.000", "hp": "083856163923", "ibu": "NUR KAYATI", "pendidikan": "S1", "tanggungan": "", "pasangan": "MUKHAMAD ILHAM", "alamat": "CEMENGBAKALAN", "rt": "011", "rw": "002", "kelurahan": "CEMENGBAKALAN", "kecamatan": "SIDOARJO", "kota": "SIDOARJO", "jabatan": "TPP", "instansi": "KEC SIDOARJO", "nip": "199411282015022001", "tmt": "2016-08-22", "jenis": "BARU", "gaji": 2372703, "tanggal": "2023-09-20", "plafond": 17500000, "jkw": 10, "analis": "ARNITYASARI IKAPUTRI", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0267038643", "createdAt": "2023-09-20T00:00:00.000Z"}, {"id": "seed-6ac5540f72", "nama": "CHOIRUN NISA", "jk": "", "tempat_lahir": "SIDOARJO", "tgl_lahir": "1975-05-13", "nik": "3515045305750002", "npwp": "45.827.189.7-617.000", "hp": "087853873535", "ibu": "KHALIMAH", "pendidikan": "SMA", "tanggungan": "", "pasangan": "M SIRUL KHALIM", "alamat": "GLAGAHARUM", "rt": "011", "rw": "003", "kelurahan": "GLAGAH ARUM", "kecamatan": "PORONG", "kota": "SIDOARJO", "jabatan": "TPP", "instansi": "DINAS KESEHATAN", "nip": "197505132008012006", "tmt": "2009-11-03", "jenis": "BARU", "gaji": 2696076, "tanggal": "2023-09-25", "plafond": 20000000, "jkw": 10, "analis": "ARNITYASARI IKAPUTRI", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0262711765", "createdAt": "2023-09-25T00:00:00.000Z"}, {"id": "seed-e28c384d2f", "nama": "EDY WINDARTO", "jk": "Laki-laki", "tempat_lahir": "SIDOARJO", "tgl_lahir": "1985-04-13", "nik": "3515081304850001", "npwp": "71.425.790.4-617.000", "hp": "085230431919", "ibu": "MURTINI", "pendidikan": "S1", "tanggungan": "", "pasangan": "ZULFA LAILI", "alamat": "BLURU KIDUL", "rt": "002", "rw": "002", "kelurahan": "BLURUKIDUL", "kecamatan": "SIDOARJO", "kota": "SIDOARJO", "jabatan": "PNS58", "instansi": "SMPN 1 SIDOARJO", "nip": "198504132009021003", "tmt": "2009-02-01", "jenis": "KOMPEN", "gaji": 2035137, "tanggal": "2023-09-25", "plafond": 115000000, "jkw": 120, "analis": "ARNITYASARI IKAPUTRI", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0262834450", "createdAt": "2023-09-25T00:00:00.000Z"}, {"id": "seed-bc1bb03df1", "nama": "ZUMROTUL LAILIL MURROH", "jk": "", "tempat_lahir": "SIDOARJO", "tgl_lahir": "1973-07-21", "nik": "3515036107730002", "npwp": "45.266.480.6-603.000", "hp": "081332994094", "ibu": "SITI FATIMAH", "pendidikan": "DIII", "tanggungan": "", "pasangan": "SUBIYANTORO", "alamat": "DUSUN GODEG WETAN", "rt": "008", "rw": "004", "kelurahan": "GADING", "kecamatan": "KREMBUNG", "kota": "SIDOARJO", "jabatan": "TPP", "instansi": "DINAS KESEHATAN", "nip": "197307211993022003", "tmt": "1995-01-28", "jenis": "BARU", "gaji": 2886993, "tanggal": "2023-09-26", "plafond": 14500000, "jkw": 10, "analis": "ARNITYASARI IKAPUTRI", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0262699439", "createdAt": "2023-09-26T00:00:00.000Z"}, {"id": "seed-77bd381cfe", "nama": "DIA AYU BUDI PUSPITARINI", "jk": "", "tempat_lahir": "SURABAYA", "tgl_lahir": "1981-02-27", "nik": "3515156702810002", "npwp": "44.950.582.7-643.000", "hp": "082234669264", "ibu": "RINI MAILAH", "pendidikan": "SMA", "tanggungan": "", "pasangan": "FENDY SUSENO", "alamat": "TEBEL BARAT", "rt": "002", "rw": "001", "kelurahan": "TEBEL", "kecamatan": "GEDANGAN", "kota": "SIDOARJO", "jabatan": "PNS58", "instansi": "DINAS KESEHATAN", "nip": "198102272010012005", "tmt": "2011-11-28", "jenis": "KOMPEN", "gaji": 3341968, "tanggal": "2023-09-29", "plafond": 126000000, "jkw": 181, "analis": "ARNITYASARI IKAPUTRI", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0262901068", "createdAt": "2023-09-29T00:00:00.000Z"}, {"id": "seed-b0d48ac127", "nama": "EDY SANTOSO", "jk": "Laki-laki", "tempat_lahir": "TRENGGALEK", "tgl_lahir": "1965-08-29", "nik": "3515082908650001", "npwp": "59.805.373.4-617.000", "hp": "087776021103", "ibu": "SOEPARTI", "pendidikan": "S1", "tanggungan": "", "pasangan": "NUNUNG HARI SUCI", "alamat": "PUCANG", "rt": "013", "rw": "003", "kelurahan": "PUCANG", "kecamatan": "SIDOARJO", "kota": "SIDOARJO", "jabatan": "PRAPEN60", "instansi": "SMPN 2 TANGGULANGIN", "nip": "196508291998021002", "tmt": "1998-02-01", "jenis": "KOMPEN", "gaji": 4145503, "tanggal": "2023-10-02", "plafond": 110000000, "jkw": 48, "analis": "ARNITYASARI IKAPUTRI", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0262847187", "createdAt": "2023-10-02T00:00:00.000Z"}, {"id": "seed-fa9bcfb820", "nama": "DENNY SUKMAWATI", "jk": "", "tempat_lahir": "MOJOKERTO", "tgl_lahir": "1992-12-28", "nik": "3516016812920001", "npwp": "35.160.168.1.292.0001", "hp": "085748101246", "ibu": "TUTIK RAHAYU", "pendidikan": "S1", "tanggungan": "", "pasangan": "RYANT PUTRA NOOR H", "alamat": "SEDATI", "rt": "004", "rw": "001", "kelurahan": "KUMITIR", "kecamatan": "JATIREJO", "kota": "MOJOKERTO", "jabatan": "TPG", "instansi": "SMKN 1 SDA", "nip": "199212282024212035", "tmt": "02-01-2026", "jenis": "BARU", "gaji": 3011384, "tanggal": "2026-04-16", "plafond": 108000000, "jkw": 60, "analis": "A AYU SRI SUSANTI", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "0452113074", "createdAt": "2026-04-16T00:00:00.000Z"}, {"id": "seed-a2a0024fef", "nama": "NILA KAMILA ", "jk": "", "tempat_lahir": "MALANG", "tgl_lahir": "1984-09-20", "nik": "3505196909840011", "npwp": "", "hp": "", "ibu": "", "pendidikan": "DIII", "tanggungan": "", "pasangan": "", "alamat": "KALIDAWIR", "rt": "012", "rw": "004", "kelurahan": "KALIDAWIR", "kecamatan": "TANGGULANGIN", "kota": "SIDOARJO", "jabatan": "PNS58", "instansi": "DINAS KESEHATAN", "nip": "19830929201704004]", "tmt": "2018-01-04", "jenis": "BARU", "gaji": 4922000, "tanggal": "2026-07-21", "plafond": 335000000, "jkw": 144, "analis": "NIP TIDAK DITEMUKAN", "marketing": "", "status": "PROSES", "catatan": "", "no_rekening": "", "createdAt": "2026-07-21T00:00:00.000Z"}];
+const INSTANSI_LIST = [{"no": 1, "kelompok": "NILA KAMILA ", "nama_instansi": "PENSIUNAN", "no_nasabah": "02600135", "no_rekening": "0269001355", "wilayah": "PENSIUNAN"}, {"no": 2, "kelompok": "HONORER, TPP,BLUD", "nama_instansi": "R/P BEND TPP/REMUN/TPOK", "no_nasabah": "47730824", "no_rekening": "0049991118", "wilayah": "HONORER, TPP,BLUD"}, {"no": 3, "kelompok": "KPJ / KPJ DARURAT / MAP", "nama_instansi": "PEGAWAI BANK JATIM ", "no_nasabah": "02600220", "no_rekening": "0269002200", "wilayah": "KPJ / KPJ DARURAT / MAP"}, {"no": 4, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "BADAN KEPEGAWAIAN DAERAH", "no_nasabah": "02600124", "no_rekening": "0269001244", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 5, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "BAPEDA", "no_nasabah": "02600117", "no_rekening": "0269001177", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 6, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "BAKESBANGPOL", "no_nasabah": "02600111", "no_rekening": "0269001111", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 7, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "BPMPKB", "no_nasabah": "02600196", "no_rekening": "0269001966", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 8, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "BPN SIDOARJO", "no_nasabah": "02600134", "no_rekening": "0269001344", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 9, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "CAB. DINAS P&K SDA", "no_nasabah": "02600261", "no_rekening": "0269092611", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 10, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DISPENDUKCAPIL", "no_nasabah": "02600154", "no_rekening": "0269001544", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 11, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DEPT. AGAMA SDA", "no_nasabah": "02600125", "no_rekening": "0269001255", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 12, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DEPT. PEMUKIMAN", "no_nasabah": "02600138", "no_rekening": "0269001388", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 13, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DEKOPERINDAG", "no_nasabah": "02600193", "no_rekening": "0269091933", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 14, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DINAS PERIJINAN", "no_nasabah": "02600168", "no_rekening": "0269001688", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 15, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DISPENDA (PROVINSI)", "no_nasabah": "02600113", "no_rekening": "0269001133", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 16, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DISPENDA PEMDA SDA", "no_nasabah": "02600126", "no_rekening": "0269001266", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 17, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PU CIPTA KARYA", "no_nasabah": "02600188", "no_rekening": "0269001888", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 18, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DPRD (ANGOTA DEWAN)", "no_nasabah": "02600197", "no_rekening": "0269001977", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 19, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DELTA GRAFIKA", "no_nasabah": "02611170", "no_rekening": "0269002981", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 20, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "INFORMASI & KOMUNIKASI", "no_nasabah": "02600155", "no_rekening": "0269001555", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 21, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DINAS KEBERSIHAN", "no_nasabah": "02600120", "no_rekening": "0269001200", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 22, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DINAS KESEHATAN", "no_nasabah": "02600114", "no_rekening": "0269001144", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 23, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DISPORA BUDPAR", "no_nasabah": "02600122", "no_rekening": "0269001222", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 24, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DINAS PASAR", "no_nasabah": "02600121", "no_rekening": "0269001211", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 25, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PDAM SDA", "no_nasabah": "02600276", "no_rekening": "0269002766", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 26, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PENGADILAN NEGERI SDA", "no_nasabah": "02600153", "no_rekening": "0269001533", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 27, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "INSPEKTORAT SDA", "no_nasabah": "02600275", "no_rekening": "0269002755", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 28, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DINAS PERHUBUNGAN", "no_nasabah": "02600144", "no_rekening": "0269001444", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 29, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DINAS PERIKANAN", "no_nasabah": "02600108", "no_rekening": "0269001088", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 30, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PERPUSTAKAAN", "no_nasabah": "02600216", "no_rekening": "0269092166", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 31, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PERTAMBANGAN DAN LINGKUNGAN HIDUP", "no_nasabah": "02600278", "no_rekening": "0269002788", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 32, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PERTANIAN DAN PERKEBUNAN", "no_nasabah": "02600112", "no_rekening": "0269001122", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 33, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PEMBERDAYAAN MASYARAKAT", "no_nasabah": "02600118", "no_rekening": "0269001188", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 34, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PU PENGAIRAN DAERAH", "no_nasabah": "02600129", "no_rekening": "0269001299", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 35, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PU BINA MARGA", "no_nasabah": "02600107", "no_rekening": "0269001077", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 36, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "RSUD SDA (PNS)", "no_nasabah": "02600115", "no_rekening": "0269001155", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 37, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "RSUD SDA (NON PNS) BLUD", "no_nasabah": "02699984", "no_rekening": "0269001038", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 38, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SATPOL PP", "no_nasabah": "02600128", "no_rekening": "0269001288", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 39, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SEKRETARIS DPRD", "no_nasabah": "02600217", "no_rekening": "0269002177", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 40, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SEKERTARIAT SDA", "no_nasabah": "02600273", "no_rekening": "0269002733", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 41, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "NILA KAMILA ", "no_nasabah": "02600191", "no_rekening": "0269001911", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 42, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "BANK JATIM SDA", "no_nasabah": "02600220", "no_rekening": "0269002200", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 43, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PDK BUDURAN", "no_nasabah": "02600245", "no_rekening": "0269002455", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 44, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PDK CANDI", "no_nasabah": "02600258", "no_rekening": "0269002588", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 45, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PDK GEDANGAN", "no_nasabah": "02600259", "no_rekening": "0269002599", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 46, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PDK JABON", "no_nasabah": "02600256", "no_rekening": "0269002566", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 47, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PDK KREMBUNG", "no_nasabah": "02600249", "no_rekening": "0269002499", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 48, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PDK KRIAN", "no_nasabah": "02600244", "no_rekening": "0269002444", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 49, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PDK PORONG", "no_nasabah": "02600246", "no_rekening": "0269002466", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 50, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PDK PRAMBON", "no_nasabah": "02600255", "no_rekening": "0269002555", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 51, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PDK SEDATI", "no_nasabah": "02600260", "no_rekening": "0269002600", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 52, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PDK SIDOARJO", "no_nasabah": "02600243", "no_rekening": "0269092433", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 53, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PDK SUKODONO", "no_nasabah": "02600252", "no_rekening": "0269092522", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 54, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PDK TAMAN", "no_nasabah": "02600253", "no_rekening": "0269002533", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 55, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PDK TANGGULANGIN", "no_nasabah": "02600257", "no_rekening": "0269002577", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 56, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PDK TARIK", "no_nasabah": "02600248", "no_rekening": "0269002488", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 57, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PDK TULANGAN", "no_nasabah": "02600250", "no_rekening": "0269002500", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 58, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PDK WARU", "no_nasabah": "02600247", "no_rekening": "0269002477", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 59, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PDK WONOAYU", "no_nasabah": "02600251", "no_rekening": "0269002511", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 60, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "KEC BALONGBENDO", "no_nasabah": "02600231", "no_rekening": "0269002311", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 61, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "KEC BUDURAN", "no_nasabah": "02600223", "no_rekening": "0269002233", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 62, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "KEC CANDI", "no_nasabah": "02600224", "no_rekening": "0269002244", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 63, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "KEC GEDANGAN", "no_nasabah": "02600234", "no_rekening": "0269092344", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 64, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "KEC JABON", "no_nasabah": "02600229", "no_rekening": "0269002299", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 65, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "KEC KREMBUNG", "no_nasabah": "02600227", "no_rekening": "0269002277", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 66, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "KEC KRIAN", "no_nasabah": "02600232", "no_rekening": "0269002322", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 67, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "KEC PORONG", "no_nasabah": "02600225", "no_rekening": "0269092255", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 68, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "KEC PRAMBON", "no_nasabah": "02600236", "no_rekening": "0269002366", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 69, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "KEC SEDATI", "no_nasabah": "02600238", "no_rekening": "0269002388", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 70, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "KEC SIDOARJO", "no_nasabah": "02600222", "no_rekening": "0269002222", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 71, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "KEC SUKODONO", "no_nasabah": "02600239", "no_rekening": "0269002399", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 72, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "KEC TAMAN", "no_nasabah": "02600235", "no_rekening": "0269002355", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 73, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "KEC TANGGULANGIN", "no_nasabah": "02600226", "no_rekening": "0269002266", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 74, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "KEC TARIK", "no_nasabah": "02600233", "no_rekening": "0269002333", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 75, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "KEC TULANGAN", "no_nasabah": "02600228", "no_rekening": "0269002288", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 76, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "KEC WARU", "no_nasabah": "02600237", "no_rekening": "0269002377", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 77, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "KEC WONOAYU", "no_nasabah": "02600230", "no_rekening": "0269002300", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 78, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMAN 1 KRIAN", "no_nasabah": "02600207", "no_rekening": "0269092077", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 79, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMAN 1 PORONG", "no_nasabah": "02600212", "no_rekening": "0269002122", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 80, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMAN 1 SDA", "no_nasabah": "02600157", "no_rekening": "0269091577", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 81, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMAN 1 TAMAN", "no_nasabah": "02600184", "no_rekening": "0269091844", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 82, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMAN 1 WARU", "no_nasabah": "02600179", "no_rekening": "0269001799", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 83, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMAN 1 GEDANGAN", "no_nasabah": "02601962", "no_rekening": "0269002891", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 84, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMAN 1 KREMBUNG", "no_nasabah": "02601964", "no_rekening": "0269002905", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 85, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMAN 3 SDA", "no_nasabah": "02600152", "no_rekening": "0269001522", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 86, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMAN 4 SDA", "no_nasabah": "02600171", "no_rekening": "0269001711", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 87, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMKN 1 BUDURAN", "no_nasabah": "02600145", "no_rekening": "0269001455", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 88, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMKN 1 SDA", "no_nasabah": "02600164", "no_rekening": "0269001644", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 89, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMKN 2 BUDURAN", "no_nasabah": "02600146", "no_rekening": "0269001466", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 90, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMKN 3 BUDURAN", "no_nasabah": "02600167", "no_rekening": "0269001677", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 91, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMAN 2 SDA", "no_nasabah": "02600832", "no_rekening": "0269002786", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 92, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 1 BALONGBENDO", "no_nasabah": "02600185", "no_rekening": "0269001855", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 93, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 1 BUDURAN", "no_nasabah": "02600164", "no_rekening": "0269001644", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 94, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 1 CANDI", "no_nasabah": "02600148", "no_rekening": "0269091488", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 95, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 1 GEDANGAN", "no_nasabah": "02600208", "no_rekening": "0269002088", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 96, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 1 JABON", "no_nasabah": "02600162", "no_rekening": "0269001622", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 97, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 1 KRIAN", "no_nasabah": "02600195", "no_rekening": "0269001955", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 98, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 1 PORONG", "no_nasabah": "02600203", "no_rekening": "0269002033", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 99, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 1 SIDOARJO", "no_nasabah": "02600213", "no_rekening": "0269002133", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 100, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 1 TAMAN", "no_nasabah": "02600174", "no_rekening": "0269001744", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 101, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 1 TANGGULANGIN", "no_nasabah": "02600163", "no_rekening": "0269001633", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 102, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 1 TARIK", "no_nasabah": "02600218", "no_rekening": "0269002188", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 103, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 1 TULANGAN", "no_nasabah": "02600156", "no_rekening": "0269001566", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 104, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 1 WARU", "no_nasabah": "02600178", "no_rekening": "0269001788", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 105, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 1 WONOAYU", "no_nasabah": "02600172", "no_rekening": "0269001722", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 106, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 1 SEDATI", "no_nasabah": "02600131", "no_rekening": "0269001311", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 107, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 2 BALONGBENDO", "no_nasabah": "02600209", "no_rekening": "0269002099", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 108, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 2 BUDURAN", "no_nasabah": "02600277", "no_rekening": "0269002777", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 109, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 2 CANDI", "no_nasabah": "02600206", "no_rekening": "0269002066", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 110, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 2 GEDANGAN", "no_nasabah": "02600137", "no_rekening": "0269001377", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 111, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 2 JABON", "no_nasabah": "02600161", "no_rekening": "0269001611", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 112, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 2 KRIAN", "no_nasabah": "02600158", "no_rekening": "0269001588", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 113, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 2 PORONG", "no_nasabah": "02600183", "no_rekening": "0269001833", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 114, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 2 SEDATI", "no_nasabah": "02600132", "no_rekening": "0269001322", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 115, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 2 SIDOARJO", "no_nasabah": "02600142", "no_rekening": "0269001422", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 116, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 2 SUKODONO", "no_nasabah": "02600204", "no_rekening": "0269002044", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 117, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 2 TAMAN", "no_nasabah": "02600189", "no_rekening": "0269001899", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 118, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 2 TANGGULANGIN", "no_nasabah": "02600192", "no_rekening": "0269001922", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 119, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 2 TARIK", "no_nasabah": "02600173", "no_rekening": "0269001733", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 120, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 2 WARU", "no_nasabah": "02600139", "no_rekening": "0269091399", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 121, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 2 WONOAYU", "no_nasabah": "02600187", "no_rekening": "0269001877", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 122, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 3 CANDI", "no_nasabah": "02600202", "no_rekening": "0269002022", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 123, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 3 KRIAN", "no_nasabah": "02600177", "no_rekening": "0269001777", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 124, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 3 PORONG", "no_nasabah": "02600205", "no_rekening": "0269002055", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 125, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 3 SDA", "no_nasabah": "02600210", "no_rekening": "0269002100", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 126, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 3 TAMAN", "no_nasabah": "02600211", "no_rekening": "0269002111", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 127, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 3 WARU", "no_nasabah": "026001988", "no_rekening": "0269001988", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 128, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 4 SDA", "no_nasabah": "02600143", "no_rekening": "0269001433", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 129, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 4 WARU", "no_nasabah": "02600147", "no_rekening": "0269001477", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 130, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 5 SDA", "no_nasabah": "02600176", "no_rekening": "0269001766", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 131, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 6 SDA", "no_nasabah": "02600149", "no_rekening": "0269001499", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 132, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 1 PRAMBON", "no_nasabah": "02600166", "no_rekening": "0269091666", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 133, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 1 SUKODONO", "no_nasabah": "02600170", "no_rekening": "0269001700", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 134, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 2 KREMBUNG", "no_nasabah": "02600165", "no_rekening": "0269001655", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 135, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DINAS SOSIAL TENAGA KERJA", "no_nasabah": "02600109", "no_rekening": "0269001099", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 136, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMPN 1 KREMBUNG", "no_nasabah": "02602905", "no_rekening": "0269002956", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 137, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMUN 1 WONOAYU", "no_nasabah": "02600215", "no_rekening": "0269002155", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 138, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "MADRASAH IBTIDAIYAH", "no_nasabah": "02600199", "no_rekening": "0269001999", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 139, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "MADRASAH SDA (MTSN)", "no_nasabah": "02600214", "no_rekening": "0269002144", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 140, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "MIN SEDATI", "no_nasabah": "02600127", "no_rekening": "0269001277", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 141, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "MTSN KRIAN", "no_nasabah": "02600160", "no_rekening": "0269001600", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 142, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "MTSN TLASIH", "no_nasabah": "02600175", "no_rekening": "0269091755", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 143, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DIKBUD SIDOARJO", "no_nasabah": "02625067", "no_rekening": "0269999781", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 144, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DIKBUD BUDURAN", "no_nasabah": "02625068", "no_rekening": "0269999799", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 145, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DIKBUD GEDANGAN", "no_nasabah": "02625069", "no_rekening": "0269999802", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 146, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DIKBUD WARU", "no_nasabah": "02625070", "no_rekening": "0269999811", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 147, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DIKBUD SEDATI", "no_nasabah": "02625071", "no_rekening": "0269999829", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 148, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DIKBUD TAMAN", "no_nasabah": "02625072", "no_rekening": "0269999837", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 149, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DIKBUD CANDI", "no_nasabah": "02625073", "no_rekening": "0269999845", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 150, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DIKBUD TANGGULAGIN", "no_nasabah": "02625074", "no_rekening": "0269999853", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 151, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DIKBUD PORONG", "no_nasabah": "02625075", "no_rekening": "0269999861", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 152, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DIKBUD JABON", "no_nasabah": "02625076", "no_rekening": "0269999870", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 153, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DIKBUD WONOAYU", "no_nasabah": "02625077", "no_rekening": "0269999888", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 154, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DIKBUD KREMBUNG", "no_nasabah": "02625078", "no_rekening": "0269999896", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 155, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DIKBUD TULANGAN", "no_nasabah": "02625079", "no_rekening": "0269999900", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 156, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DIKBUD SUKODONO", "no_nasabah": "02625080", "no_rekening": "0269999918", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 157, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DIKBUD KRIAN", "no_nasabah": "02625081", "no_rekening": "0269999926", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 158, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DIKBUD PRAMBON", "no_nasabah": "02625082", "no_rekening": "0269999934", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 159, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DIKBUD BALONGBENDO", "no_nasabah": "02625083", "no_rekening": "0269999942", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 160, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DIKBUD TARIK", "no_nasabah": "02625084", "no_rekening": "0269999951", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 161, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "KANTOR GOL II", "no_nasabah": "02625085", "no_rekening": "0269999969", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 162, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "KANTOR GOL III", "no_nasabah": "02625086", "no_rekening": "0269999977", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 163, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "P & K SIDOARJO", "no_nasabah": "02600261", "no_rekening": "0269092611", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 164, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PMI", "no_nasabah": "02690010", "no_rekening": "0269111151", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 165, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "POLRES", "no_nasabah": "02625187", "no_rekening": "0269100010", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 166, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DINSOS GEPENG", "no_nasabah": "02671066", "no_rekening": "0269100753", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 167, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "DINSOS BALITA", "no_nasabah": "02670950", "no_rekening": "0269100745", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 168, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "BPBD", "no_nasabah": "02680487", "no_rekening": "0269000902", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 169, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "BADAN KETAHANAN PANGAN", "no_nasabah": "02669526", "no_rekening": "0269100737", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 170, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SEKWAN PENGURUS KORPRI", "no_nasabah": "02680540", "no_rekening": "0269000911", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 171, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PENGADILAN AGAMA", "no_nasabah": "02699985", "no_rekening": "0269001020", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 172, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMP HANGTUAH 5", "no_nasabah": "02663363", "no_rekening": "0269100591", "wilayah": "SWASTA"}, {"no": 173, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "SMA SUNAN AMPEL PORONG", "no_nasabah": "02600265", "no_rekening": "0269100371", "wilayah": "SWASTA"}, {"no": 174, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "BPIPI", "no_nasabah": "02699993", "no_rekening": "0269000929", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 175, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "KPKNL", "no_nasabah": "02667535", "no_rekening": "0269100711", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 176, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "BPR PURIDANA ARTHAMAS", "no_nasabah": "02699500", "no_rekening": "0269111518", "wilayah": "BPR SIDOARJO"}, {"no": 178, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "BAZNAS KAB SIDOARJO", "no_nasabah": "60411554", "no_rekening": "0269113324", "wilayah": "DINAS KAB SIDOARJO"}, {"no": 179, "kelompok": "DINAS KAB SIDOARJO ", "nama_instansi": "PENSIUNAN ASABRI", "no_nasabah": null, "no_rekening": null, "wilayah": "ASABRI"}];
+const NIP_LIST = [{"nip": "19890898", "nama": "NILA KAMILA "}, {"nip": "20144123", "nama": "GANDAYU DIMA PINASTIYA"}, {"nip": "20041878", "nama": "BAMBANG SUSENO BROTO"}, {"nip": "20144297", "nama": "RADITYA DWI SULAKSONO"}, {"nip": "20156672", "nama": "KHITTAH ARIYAM MUKTI"}, {"nip": "20146434", "nama": "ARI RACHMAD UDIN WINARKO"}, {"nip": "20146455", "nama": "KHRISNA SATRIADAYA"}, {"nip": "20146461", "nama": "TEGUH CANDRA IRAWAN"}, {"nip": "20144302", "nama": "BAGUS ARIE NUGROHO"}, {"nip": "20144305", "nama": "ADI NUGRAHA PURNA PUTRA"}, {"nip": "20144329", "nama": "MOCH FAISOL MASUM"}, {"nip": "20144379", "nama": "YUDI ANDRIONO"}, {"nip": "20146310", "nama": "DWI HARMOKO"}, {"nip": "20144345", "nama": "PRIMBON HASIBUAN"}, {"nip": "20212019", "nama": "NINDA MAZIELIN"}, {"nip": "20216036", "nama": "BARU WANADRI"}, {"nip": "20133398", "nama": "SENDANG ARGA WILIS"}, {"nip": "20133346", "nama": "ALFIRANGGA BAYU"}, {"nip": "20133637", "nama": "GITA PUSPITA SARI"}, {"nip": "20123601", "nama": "VENTIKA NUR AINI"}, {"nip": "20144049", "nama": "BAYU MAHENDRA"}, {"nip": "20168100", "nama": "SANDTYA FEBRIANA WENTY P"}, {"nip": "20133909", "nama": "NUR HAYATI"}, {"nip": "20112820", "nama": "ANGGRAENI WULANSARI"}, {"nip": "20168899", "nama": "EDO PRASETYO"}, {"nip": "20133708", "nama": "ADITYA PUTRA PRADHANA"}, {"nip": "20158779", "nama": "DINI TRI TUNGGAL DEWI"}, {"nip": "20144106", "nama": "ARDHILA SURYANI PALUPI"}, {"nip": "20168252", "nama": "DODDY DWI JATMIKO"}, {"nip": "20062308", "nama": "FARIDA ZAHRA"}, {"nip": "20168203", "nama": "YOGA DITYA ANGGARA"}, {"nip": "20133713", "nama": "NI LUH DEVI"}, {"nip": "20112855", "nama": "KRISNA WIDYASARI"}, {"nip": "20168150", "nama": "EDWARD ROBINSAR SINAGA"}, {"nip": "20133347", "nama": "FAHMI YUSITASARI"}, {"nip": "20144131", "nama": "DINA AYU FITRIANA"}, {"nip": "20133362", "nama": "NICOLAUS ANDOYO"}, {"nip": "20123049", "nama": "RENI HERAWATI"}, {"nip": "20123149", "nama": "SUDRAJAT PRIYO LAKSONO"}, {"nip": "20158550", "nama": "FEBRYANA MEGAWATI"}, {"nip": "20168906", "nama": "FARRAH BAYU MEGANINGRUM"}, {"nip": "20112655", "nama": "DINA RAHMAWATI"}, {"nip": "20133705", "nama": "JISELLA FITRI AMEYLIA"}, {"nip": "20112657", "nama": "NI NENGAH PUTRI ADHY"}, {"nip": "20081809", "nama": "IDHAM CHALID"}, {"nip": "20081922", "nama": "BERLIAN SETYAWATI"}, {"nip": "20133910", "nama": "IMANZAH YOGA R"}, {"nip": "20144071", "nama": "ENGGAR ADI S"}, {"nip": "20133793", "nama": "NOVARICA SENDY DWI ANANDA"}, {"nip": "20134435", "nama": "TEGUH SUJATMIKO"}, {"nip": "20133391", "nama": "GLADYS RIYANDINI SANTOSO"}, {"nip": "20133711", "nama": "I GUSTI BAGUS MADE GIRI YUDA A"}, {"nip": "20144487", "nama": "SUSANTI RACHMAWARDANI"}, {"nip": "20011560", "nama": "ROOSIANA ARINDIYA UTAMI"}, {"nip": "20123599", "nama": "OFI RISTIA BRIANDA"}, {"nip": "20168194", "nama": "SOMA ALDILA"}, {"nip": "20062195", "nama": "DEWI RACHMAWATY"}, {"nip": "20133348", "nama": "NOVILA IKE W"}, {"nip": "20133796", "nama": "INDAH PURWASIH"}, {"nip": "20168543", "nama": "ITA SUCIHATI"}, {"nip": "20133349", "nama": "AULIA DWI H"}, {"nip": "20168253", "nama": "DWI ARI ANDINI"}, {"nip": "20133704", "nama": "ANNISA ANDADARI"}, {"nip": "20123551", "nama": "CHANDRA SUMARNO PUTRO"}, {"nip": "20112658", "nama": "DWI PRASETYO DARMAWAN"}, {"nip": "20133906", "nama": "YULFIKAR SEPTIAN P"}, {"nip": "20133794", "nama": "M. SAHRI"}, {"nip": "20144082", "nama": "IRMA FAUZIA"}, {"nip": "20168699", "nama": "I MADE SWASTIKA"}, {"nip": "20168518", "nama": "OKTA CANDRA PRASETYO"}, {"nip": "20082305", "nama": "SANTI KRESTINAWATI"}, {"nip": "20144481", "nama": "ARIF RAHMAN HAKIM"}, {"nip": "20123175", "nama": "RADITYA TRIHATMA"}, {"nip": "20168354", "nama": "ISAAC MUHAMMAD"}, {"nip": "20158574", "nama": "RANI AYU RACHMASARI"}, {"nip": "20133920", "nama": "RANGGA ARIEF B"}, {"nip": "20133993", "nama": "DIKKA WIHARSA P"}, {"nip": "20168037", "nama": "FAUZANDI SURYAHUDA"}, {"nip": "20168104", "nama": "TIA PRADIPTA SASNINDYAH ARI"}, {"nip": "20133896", "nama": "LULUK ERNAWATI"}, {"nip": "20134199", "nama": "FINDHA PUSPITA DEWI A S"}, {"nip": "20168061", "nama": "MUHAMMAD GARISA PRADHINU"}, {"nip": "20041997", "nama": "RISTA MAHARANI"}, {"nip": "20133357", "nama": "KHAIRUNNISA AMALINA"}, {"nip": "20133710", "nama": "FRANCOYSYATIA PRAWIRA N"}, {"nip": "20062198", "nama": "ARIK RAHMAWATI"}, {"nip": "20112781", "nama": "DIAN LUKITANINGTYAS"}, {"nip": "20133706", "nama": "TAUFAN RAKHMAD ABADI"}, {"nip": "20168050", "nama": "KAUTSARANI PERMATA ALAM"}, {"nip": "20168425", "nama": "REDDY SOELISTYAJI"}, {"nip": "20168960", "nama": "DENNY SURYO WIJAYANTO"}, {"nip": "20133992", "nama": "DIKHA MEGARINI AKBAR"}, {"nip": "20133355", "nama": "SHINTA AYUNINGRUM"}, {"nip": "20133707", "nama": "YOKO ULIAKBAR"}, {"nip": "20168027", "nama": "DINNA RENETTE NAIBAHO"}, {"nip": "20133351", "nama": "MITHASARI PUTRI M"}, {"nip": "20133356", "nama": "WIDOTOMO"}, {"nip": "20133795", "nama": "THERESIA SENGGO ODAYATI"}, {"nip": "20133359", "nama": "FARIDA RAHMANIA"}, {"nip": "20031910", "nama": "KARDONO"}, {"nip": "19891197", "nama": "NUR BACHTIAR MF"}, {"nip": "20052404", "nama": "FIRMAN HARMAWAN"}, {"nip": "19951442", "nama": "KADERI"}, {"nip": "20052405", "nama": "MUKHSONUL KAHFI"}, {"nip": "20092522", "nama": "S. ARRIEL S.D"}, {"nip": "20082304", "nama": "CHRISTINA ULFI SANDRIA"}, {"nip": "20062102", "nama": "HELLMY ASTIKA KISWARA"}, {"nip": "19880826", "nama": "RORY SRI WULANSARI"}, {"nip": "20041793", "nama": "IVAN KUSUMA TRI SUMARNO"}, {"nip": "20011648", "nama": "ELLEN EKA SANNITA"}, {"nip": "19971381", "nama": "IRA BUDI LESTARI"}, {"nip": "20082242", "nama": "RATIH PUSPITASARI EKO PUTRI"}, {"nip": "20092459", "nama": "SURYO ADHI MARDIKO"}, {"nip": "20168040", "nama": "M. SUBUR GUNARSYAH"}, {"nip": "20062088", "nama": "DIAS VIVIN YULIARTI"}, {"nip": "20062154", "nama": "DIDIEN YUNIARTI HADIE"}, {"nip": "20051977", "nama": "DWIANA SULISTYANINGRUM"}, {"nip": "20032039", "nama": "NUR AZIS"}, {"nip": "20021614", "nama": "HERRY SETYA YUDAKKA"}, {"nip": "20062204", "nama": "INDAH HADI PURWANTI"}, {"nip": "20041960", "nama": "IRMA SEPTADIANA"}, {"nip": "19911107", "nama": "HERNA MUNDUNG S"}, {"nip": "20011561", "nama": "ROMADHINA ASWINDARTI"}, {"nip": "20021567", "nama": "ENY SUPRAPTI"}, {"nip": "20168016", "nama": "EMMY SUCIATY"}, {"nip": "20041780", "nama": "NENY DESI ARINI"}, {"nip": "19900797", "nama": "ANDRIANI"}, {"nip": "20062354", "nama": "FADILA WISTANTRI"}, {"nip": "19860708", "nama": "RITA KUSWURININGTYAS"}, {"nip": "19931056", "nama": "YANTI PRAWITASARI"}, {"nip": "19910994", "nama": "BHINNEKA SAPTONO"}, {"nip": "19911132", "nama": "DIAH SUKESI"}, {"nip": "20062093", "nama": "ALVI TAMA HILMAN T"}, {"nip": "20031687", "nama": "ASRI KUSUMAYANTI"}, {"nip": "20212054", "nama": "NUR KAMILAH BAFADAL"}, {"nip": "20216052", "nama": "MUHAMMAD YAN FATAHILAH"}, {"nip": "20216029", "nama": "AFIFAH BIANTI EFFENDY"}, {"nip": "20213006", "nama": "DINDA PRASESTININGTYAS"}, {"nip": "20216032", "nama": "ANYS KHOIRIYAH"}, {"nip": "20214076", "nama": "MAHATHADEA ABELLYSA HUTAPEA"}, {"nip": "20214037", "nama": "CORNELIUS BLESSIO V"}, {"nip": "20123556", "nama": "DAHLAN FAHRULI"}, {"nip": "20041811", "nama": "ELLY KURNIAWATI"}, {"nip": "20221058", "nama": "JALALUDIN SUYUTI"}, {"nip": "20168523", "nama": "DHIMAS PERDHITA"}, {"nip": "20133815", "nama": "SAFITRI INDRAYANTI"}, {"nip": "20133814", "nama": "ARNITYASARI IKAPUTRI"}, {"nip": "20144402", "nama": "DEVI MEILINA"}, {"nip": "20168902", "nama": "ERLITA FEBRIANA"}, {"nip": "20133770", "nama": "A AYU SRI SUSANTI"}];
+const JABATAN_TABLE = [{"jabatan": "CPNS", "rpc": 0.9, "premi": 0.004, "usia_pensiun": 58}, {"jabatan": "PNS58", "rpc": 0.9, "premi": 0.004, "usia_pensiun": 58}, {"jabatan": "PNS60", "rpc": 0.9, "premi": 0.004, "usia_pensiun": 60}, {"jabatan": "PENSIUNAN", "rpc": 0.7, "premi": 0.005, "usia_pensiun": 75}, {"jabatan": "P3K", "rpc": 0.9, "premi": 0.004, "usia_pensiun": 60}, {"jabatan": "PRAPEN58", "rpc": 0.7, "premi": 0.004, "usia_pensiun": 75}, {"jabatan": "PRAPEN60", "rpc": 0.7, "premi": 0.004, "usia_pensiun": 75}, {"jabatan": "TPP", "rpc": 0.8, "premi": 0.004, "usia_pensiun": 58}, {"jabatan": "SWASTA", "rpc": 0.7, "premi": 0.004, "usia_pensiun": 56}, {"jabatan": "HONORER", "rpc": 0.7, "premi": 0.004, "usia_pensiun": 60}, {"jabatan": "PERANGKAT DESA", "rpc": 0.8, "premi": 0.004, "usia_pensiun": 60}, {"jabatan": "TPG", "rpc": 0.8, "premi": 0.004, "usia_pensiun": 60}, {"jabatan": "REMUN58/3BLN", "rpc": 0.8, "premi": 0.004, "usia_pensiun": 58}, {"jabatan": "PENSIUNAN JANDA/DUDA", "rpc": 0.7, "premi": 0.005, "usia_pensiun": 65}, {"jabatan": "BLUD NON ASN TETAP", "rpc": 0.9, "premi": 0.004, "usia_pensiun": 58}, {"jabatan": "BUMN/BUMD", "rpc": 0.9, "premi": 0.004, "usia_pensiun": 56}, {"jabatan": "ANGGOTA LEGISLATIF", "rpc": 0.9, "premi": 0.004, "usia_pensiun": 75}, {"jabatan": "PENSIUNAN USAHA", "rpc": 0.9, "premi": 0.005, "usia_pensiun": 75}, {"jabatan": "PRAPEN58 USAHA", "rpc": 0.9, "premi": 0.004, "usia_pensiun": 75}, {"jabatan": "PRAPEN60 USAHA", "rpc": 0.9, "premi": 0.004, "usia_pensiun": 75}];
+const JKW_TABLE = [{"jabatan": "CPNS", "kelompok": "CPNS", "jkw_tahun": 10, "jkw_bulan": 120}, {"jabatan": "PNS58", "kelompok": "PNS", "jkw_tahun": 20, "jkw_bulan": 240}, {"jabatan": "PNS60", "kelompok": "PNS", "jkw_tahun": 20, "jkw_bulan": 240}, {"jabatan": "PENSIUNAN", "kelompok": "PENSIUNAN", "jkw_tahun": 15, "jkw_bulan": 180}, {"jabatan": "P3K", "kelompok": "P3K", "jkw_tahun": 5, "jkw_bulan": 60}, {"jabatan": "PRAPEN58", "kelompok": "PRAPEN", "jkw_tahun": 20, "jkw_bulan": 240}, {"jabatan": "PRAPEN60", "kelompok": "PRAPEN", "jkw_tahun": 20, "jkw_bulan": 240}, {"jabatan": "TPP", "kelompok": "TPP", "jkw_tahun": 5, "jkw_bulan": 60}, {"jabatan": "SWASTA", "kelompok": "SWASTA", "jkw_tahun": 15, "jkw_bulan": 180}, {"jabatan": "HONORER", "kelompok": "HONORER", "jkw_tahun": 1, "jkw_bulan": 12}, {"jabatan": "PERANGKAT DESA", "kelompok": "PERANGKAT DESA", "jkw_tahun": 6, "jkw_bulan": 72}, {"jabatan": "TPG", "kelompok": "TPG", "jkw_tahun": 5, "jkw_bulan": 60}, {"jabatan": "REMUN58/3BLN", "kelompok": "TPP", "jkw_tahun": 5, "jkw_bulan": 60}, {"jabatan": "PENSIUNAN JANDA/DUDA", "kelompok": "PENSIUNAN", "jkw_tahun": 5, "jkw_bulan": 60}, {"jabatan": "BLUD NON ASN TETAP", "kelompok": "BLUD", "jkw_tahun": 10, "jkw_bulan": 120}, {"jabatan": "BUMN/BUMD", "kelompok": "BUMN/BUMD", "jkw_tahun": 20, "jkw_bulan": 240}, {"jabatan": "ANGGOTA LEGISLATIF", "kelompok": "DPRD", "jkw_tahun": 5, "jkw_bulan": 60}, {"jabatan": "PENSIUNAN USAHA", "kelompok": "PENSIUNAN USAHA", "jkw_tahun": 15, "jkw_bulan": 180}, {"jabatan": "PRAPEN58 USAHA", "kelompok": "PRAPEN USAHA", "jkw_tahun": 20, "jkw_bulan": 240}, {"jabatan": "PRAPEN60 USAHA", "kelompok": "PRAPEN USAHA", "jkw_tahun": 20, "jkw_bulan": 240}];
+
+const DEFAULT_SETTINGS = {
+  pincaNama: "DEDDY AJI WIJAYA",
+  pincaJabatan: "Pemimpin Cabang",
+  analisDefault: "DHIMAS PERDHITA",
+  sukuBunga: 12,
+  provisi: 1
+};
+
+/* ============ STATE ============ */
+let NASABAH = [];
+let SETTINGS = {...DEFAULT_SETTINGS};
+let editingId = null;
+
+/* ============ STORAGE HELPERS ============
+   Dual mode:
+   1) Jika SHEET_API_URL diisi (URL Web App Google Apps Script) -> pakai Google Sheets sebagai
+      database bersama, bisa diakses dari mana saja termasuk saat di-hosting di luar Claude.
+   2) Jika dikosongkan -> otomatis pakai penyimpanan bawaan artifact Claude (window.storage),
+      supaya tetap bisa dicoba langsung di sini sebelum di-deploy ke hosting sendiri.
+
+   CARA ISI: deploy Google Apps Script (lihat file AppsScript_Code.gs yang menyertai aplikasi ini),
+   copy "Web app URL"-nya, lalu tempel di antara tanda kutip di bawah ini. */
+const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxHgIR9AVjJdz2moWFX7AtPLQMJCZMm-Q0Z76Ne3ywuQhbJ32KnTvgTnhM2DNoXx1Xc-Q/exec"; // <-- contoh: "https://script.google.com/macros/s/AKfycb.../exec"
+
+const USE_SHEETS = SHEET_API_URL && SHEET_API_URL.trim().length > 0;
+
+async function sheetGet(key){
+  const res = await fetch(SHEET_API_URL + '?key=' + encodeURIComponent(key));
+  const data = await res.json();
+  return data.value;
+}
+async function sheetSet(key, value){
+  await fetch(SHEET_API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // hindari CORS preflight
+    body: JSON.stringify({ key, value })
+  });
+}
+
+async function loadData(){
+  try{
+    let raw;
+    if(USE_SHEETS){
+      raw = await sheetGet('kmg-nasabah-list');
+    }else{
+      const res = await window.storage.get('kmg-nasabah-list', true);
+      raw = res ? res.value : null;
+    }
+    NASABAH = raw ? JSON.parse(raw) : null;
+  }catch(e){ console.error('Gagal memuat data nasabah:', e); NASABAH = null; }
+  if(!NASABAH || !NASABAH.length){
+    NASABAH = SEED_RECORDS.map(r => ({...r}));
+    await saveData();
+  }
+  try{
+    let rawSettings;
+    if(USE_SHEETS){
+      rawSettings = await sheetGet('kmg-settings');
+    }else{
+      const res2 = await window.storage.get('kmg-settings', true);
+      rawSettings = res2 ? res2.value : null;
+    }
+    if(rawSettings) SETTINGS = {...DEFAULT_SETTINGS, ...JSON.parse(rawSettings)};
+  }catch(e){ console.error('Gagal memuat pengaturan:', e); }
+}
+async function saveData(){
+  try{
+    if(USE_SHEETS) await sheetSet('kmg-nasabah-list', JSON.stringify(NASABAH));
+    else await window.storage.set('kmg-nasabah-list', JSON.stringify(NASABAH), true);
+  }catch(e){ console.error('Gagal menyimpan data nasabah:', e); alert('Gagal menyimpan data. Cek koneksi / URL Google Sheets API.'); }
+}
+async function saveSettings(){
+  try{
+    if(USE_SHEETS) await sheetSet('kmg-settings', JSON.stringify(SETTINGS));
+    else await window.storage.set('kmg-settings', JSON.stringify(SETTINGS), true);
+  }catch(e){ console.error('Gagal menyimpan pengaturan:', e); }
+}
+
+/* ============ FORMULA / CALC ENGINE ============
+   Mirror of formula logic from sheet INPUT + DB in the original workbook. */
+function findJabatan(nama){ return JABATAN_TABLE.find(j => j.jabatan === nama); }
+function findJKW(nama){ return JKW_TABLE.find(j => j.jabatan === nama); }
+
+function monthsBetween(d1, d2){
+  // whole months between two ISO date strings (like Excel DATEDIF ..,"M")
+  if(!d1 || !d2) return null;
+  const a = new Date(d1), b = new Date(d2);
+  let months = (b.getFullYear()-a.getFullYear())*12 + (b.getMonth()-a.getMonth());
+  if(b.getDate() < a.getDate()) months -= 1;
+  return months;
+}
+function yearsDecimal(d1, d2){
+  if(!d1 || !d2) return null;
+  const a = new Date(d1), b = new Date(d2);
+  return ((b.getMonth()-a.getMonth())+((b.getFullYear()-a.getFullYear())*12))/12;
+}
+function addYears(dateStr, years){
+  if(!dateStr) return null;
+  const d = new Date(dateStr);
+  d.setFullYear(d.getFullYear() + Math.floor(years));
+  d.setMonth(d.getMonth() + Math.round((years - Math.floor(years))*12));
+  return d;
+}
+function pmt(rate, nper, pv){
+  if(!nper) return 0;
+  if(rate === 0) return -pv/nper;
+  const f = Math.pow(1+rate, nper);
+  return -pv*rate*f/(f-1);
+}
+
+function computeDerived(rec){
+  const jab = findJabatan(rec.jabatan) || {rpc:0.7, premi:0.004, usia_pensiun:60};
+  const jkwRef = findJKW(rec.jabatan) || {jkw_bulan: 180};
+  const tgl = rec.tanggal || new Date().toISOString().slice(0,10);
+
+  const usiaSekarang = rec.tgl_lahir ? yearsDecimal(rec.tgl_lahir, tgl) : null;
+  const masaKerjaBulan = rec.tmt ? monthsBetween(rec.tmt, tgl) : null;
+  const tglPensiunEst = rec.tgl_lahir ? addYears(rec.tgl_lahir, jab.usia_pensiun) : null;
+  const sisaMasaAktifBulan = tglPensiunEst ? monthsBetween(tgl, tglPensiunEst.toISOString().slice(0,10)) : null;
+  const maxJangkaWaktuSOP = jkwRef.jkw_bulan;
+  const maxWaktuLoanAktif = (sisaMasaAktifBulan!=null) ? Math.min(sisaMasaAktifBulan, maxJangkaWaktuSOP) : maxJangkaWaktuSOP;
+
+  const sukuBunga = (SETTINGS.sukuBunga||12)/100;
+  const monthlyRate = sukuBunga/12;
+  const jkwBulan = Number(rec.jkw)||0;
+  const gaji = Number(rec.gaji)||0;
+  const plafondDiminta = Number(rec.plafond)||0;
+
+  const anuitasFactor = jkwBulan>0 ? pmt(monthlyRate, jkwBulan, -1) : 0;
+  const maxPlafond = anuitasFactor>0 ? (jab.rpc*gaji)/anuitasFactor : 0;
+  const angsuran = jkwBulan>0 ? Math.ceil(pmt(monthlyRate, jkwBulan, -plafondDiminta)*100)/100 : 0;
+
+  let biayaAdmin;
+  if(plafondDiminta<=25000000) biayaAdmin=25000;
+  else if(plafondDiminta<=50000000) biayaAdmin=50000;
+  else if(plafondDiminta<=100000000) biayaAdmin=100000;
+  else biayaAdmin=250000;
+
+  const provisiPct = (SETTINGS.provisi||1)/100;
+  const biayaProvisi = plafondDiminta*provisiPct;
+  const usiaLunas = (usiaSekarang!=null) ? usiaSekarang + (jkwBulan/12) : null;
+  const layak = plafondDiminta>0 && plafondDiminta<=maxPlafond;
+
+  return {
+    rpc: jab.rpc, premi: jab.premi, usiaPensiun: jab.usia_pensiun,
+    usiaSekarang, masaKerjaBulan, sisaMasaAktifBulan, maxJangkaWaktuSOP, maxWaktuLoanAktif,
+    sukuBunga: sukuBunga*100, maxPlafond, angsuran, biayaAdmin, biayaProvisi, usiaLunas,
+    layak, tglPensiunEst
+  };
+}
+
+/* ============ FORMAT HELPERS ============ */
+function rp(n){ if(n==null||isNaN(n)) return "-"; return "Rp " + Math.round(n).toLocaleString('id-ID'); }
+function num(n,d=1){ if(n==null||isNaN(n)) return "-"; return Number(n).toLocaleString('id-ID',{maximumFractionDigits:d}); }
+function fmtDate(iso){
+  if(!iso) return "-";
+  const d = new Date(iso);
+  if(isNaN(d)) return iso;
+  return d.toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'});
+}
+function uid(){ return 'n' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+/* ============ TABS ============ */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('view-'+btn.dataset.tab).classList.add('active');
+    if(btn.dataset.tab==='dashboard') renderDashboard();
+    if(btn.dataset.tab==='data') renderTable();
+    if(btn.dataset.tab==='dokumen') populateDocSelect();
+  });
+});
+
+/* ============ INIT DROPDOWNS ============ */
+function initStaticDropdowns(){
+  const jabatanSel = document.getElementById('f-jabatan');
+  JABATAN_TABLE.forEach(j=>{
+    const o=document.createElement('option'); o.value=j.jabatan; o.textContent=j.jabatan+" (RPC "+Math.round(j.rpc*100)+"%, pensiun "+j.usia_pensiun+"th)";
+    jabatanSel.appendChild(o);
+  });
+  const filterJab = document.getElementById('filter-jabatan');
+  JABATAN_TABLE.forEach(j=>{
+    const o=document.createElement('option'); o.value=j.jabatan; o.textContent=j.jabatan;
+    filterJab.appendChild(o);
+  });
+  const dlInstansi = document.getElementById('dl-instansi');
+  const seen = new Set();
+  INSTANSI_LIST.forEach(i=>{
+    if(i.nama_instansi && !seen.has(i.nama_instansi)){
+      seen.add(i.nama_instansi);
+      const o=document.createElement('option'); o.value=i.nama_instansi;
+      dlInstansi.appendChild(o);
+    }
+  });
+  const dlNip = document.getElementById('dl-nip');
+  NIP_LIST.forEach(p=>{
+    const o=document.createElement('option'); o.value=p.nama;
+    dlNip.appendChild(o);
+  });
+}
+
+/* ============ FORM: LIVE CALC PREVIEW ============ */
+const formIds = ['f-nama','f-jk','f-tempat_lahir','f-tgl_lahir','f-nik','f-npwp','f-hp','f-ibu','f-pendidikan',
+  'f-tanggungan','f-pasangan','f-alamat','f-rt','f-rw','f-kelurahan','f-kecamatan','f-kota','f-jabatan','f-instansi',
+  'f-nip','f-tmt','f-jenis','f-gaji','f-tanggal','f-plafond','f-jkw','f-analis','f-marketing','f-status','f-catatan'];
+
+function readForm(){
+  const rec = {};
+  rec.nama = document.getElementById('f-nama').value.trim();
+  rec.jk = document.getElementById('f-jk').value;
+  rec.tempat_lahir = document.getElementById('f-tempat_lahir').value.trim();
+  rec.tgl_lahir = document.getElementById('f-tgl_lahir').value;
+  rec.nik = document.getElementById('f-nik').value.trim();
+  rec.npwp = document.getElementById('f-npwp').value.trim();
+  rec.hp = document.getElementById('f-hp').value.trim();
+  rec.ibu = document.getElementById('f-ibu').value.trim();
+  rec.pendidikan = document.getElementById('f-pendidikan').value;
+  rec.tanggungan = document.getElementById('f-tanggungan').value;
+  rec.pasangan = document.getElementById('f-pasangan').value.trim();
+  rec.alamat = document.getElementById('f-alamat').value.trim();
+  rec.rt = document.getElementById('f-rt').value.trim();
+  rec.rw = document.getElementById('f-rw').value.trim();
+  rec.kelurahan = document.getElementById('f-kelurahan').value.trim();
+  rec.kecamatan = document.getElementById('f-kecamatan').value.trim();
+  rec.kota = document.getElementById('f-kota').value.trim();
+  rec.jabatan = document.getElementById('f-jabatan').value;
+  rec.instansi = document.getElementById('f-instansi').value.trim();
+  rec.nip = document.getElementById('f-nip').value.trim();
+  rec.tmt = document.getElementById('f-tmt').value;
+  rec.jenis = document.getElementById('f-jenis').value;
+  rec.gaji = document.getElementById('f-gaji').value;
+  rec.tanggal = document.getElementById('f-tanggal').value;
+  rec.plafond = document.getElementById('f-plafond').value;
+  rec.jkw = document.getElementById('f-jkw').value;
+  rec.analis = document.getElementById('f-analis').value.trim();
+  rec.marketing = document.getElementById('f-marketing').value.trim();
+  rec.status = document.getElementById('f-status').value;
+  rec.catatan = document.getElementById('f-catatan').value.trim();
+  return rec;
+}
+
+function updateCalcPreview(){
+  const rec = readForm();
+  const d = computeDerived(rec);
+  const cards = document.getElementById('calc-cards');
+  cards.innerHTML = `
+    <div class="card"><h3>RPC</h3><div class="val">${Math.round(d.rpc*100)}%</div></div>
+    <div class="card"><h3>Usia Sekarang</h3><div class="val">${d.usiaSekarang!=null?num(d.usiaSekarang,1)+' th':'-'}</div></div>
+    <div class="card"><h3>Sisa Masa Aktif</h3><div class="val">${d.sisaMasaAktifBulan!=null?d.sisaMasaAktifBulan+' bln':'-'}</div></div>
+    <div class="card"><h3>Maks Jangka Waktu</h3><div class="val">${d.maxWaktuLoanAktif!=null?d.maxWaktuLoanAktif+' bln':'-'}</div></div>
+    <div class="card"><h3>Maks Plafond</h3><div class="val">${rp(d.maxPlafond)}</div></div>
+    <div class="card"><h3>Angsuran/bulan</h3><div class="val">${rp(d.angsuran)}</div></div>
+    <div class="card"><h3>Biaya Admin</h3><div class="val">${rp(d.biayaAdmin)}</div></div>
+    <div class="card"><h3>Biaya Provisi</h3><div class="val">${rp(d.biayaProvisi)}</div></div>
+    <div class="card"><h3>Kelayakan</h3><div class="val"><span class="flag ${d.layak?'ok':'bad'}">${rec.plafond?(d.layak?'LAYAK':'MELEBIHI MAKS'):'-'}</span></div></div>
+  `;
+}
+formIds.forEach(id=>{
+  document.getElementById(id).addEventListener('input', updateCalcPreview);
+  document.getElementById(id).addEventListener('change', updateCalcPreview);
+});
+
+document.getElementById('form-nasabah').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const rec = readForm();
+  if(editingId){
+    const idx = NASABAH.findIndex(n=>n.id===editingId);
+    if(idx>-1) NASABAH[idx] = {...NASABAH[idx], ...rec};
+    editingId = null;
+    document.getElementById('btn-submit').textContent = 'Simpan Nasabah';
+  }else{
+    rec.id = uid();
+    rec.createdAt = new Date().toISOString();
+    NASABAH.push(rec);
+  }
+  await saveData();
+  document.getElementById('form-nasabah').reset();
+  document.getElementById('f-kota').value='SIDOARJO';
+  updateCalcPreview();
+  alert('Data nasabah tersimpan.');
+  renderTable();
+  renderDashboard();
+});
+document.getElementById('btn-reset').addEventListener('click', ()=>{
+  document.getElementById('form-nasabah').reset();
+  document.getElementById('f-kota').value='SIDOARJO';
+  editingId=null;
+  document.getElementById('btn-submit').textContent='Simpan Nasabah';
+  updateCalcPreview();
+});
+
+/* ============ TABLE / MONITORING ============ */
+function renderTable(){
+  const q = document.getElementById('search-box').value.toLowerCase();
+  const fStatus = document.getElementById('filter-status').value;
+  const fJab = document.getElementById('filter-jabatan').value;
+  const tbody = document.getElementById('data-tbody');
+  let rows = NASABAH.filter(r=>{
+    if(fStatus && r.status!==fStatus) return false;
+    if(fJab && r.jabatan!==fJab) return false;
+    if(q){
+      const hay = ((r.nama||'')+' '+(r.nip||'')+' '+(r.instansi||'')).toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+  document.getElementById('count-note').textContent = rows.length + ' dari ' + NASABAH.length + ' nasabah';
+  if(!rows.length){
+    tbody.innerHTML = `<tr><td colspan="12" class="empty">Tidak ada data yang cocok.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map((r,i)=>{
+    const d = computeDerived(r);
+    return `<tr>
+      <td>${i+1}</td>
+      <td><strong>${r.nama||'-'}</strong></td>
+      <td>${r.jabatan||'-'}</td>
+      <td>${r.instansi||'-'}</td>
+      <td>${rp(Number(r.gaji))}</td>
+      <td>${rp(Number(r.plafond))}</td>
+      <td>${rp(d.maxPlafond)} ${d.layak?'':'&#9888;&#65039;'}</td>
+      <td>${r.jkw||'-'} bln</td>
+      <td>${rp(d.angsuran)}</td>
+      <td><span class="status-pill status-${r.status||'PROSES'}">${r.status||'PROSES'}</span></td>
+      <td>${r.analis||'-'}</td>
+      <td>
+        <button class="icon-btn" onclick="viewDetail('${r.id}')">Lihat</button>
+        <button class="icon-btn" onclick="editRecord('${r.id}')">Edit</button>
+        <button class="icon-btn" onclick="deleteRecord('${r.id}')">Hapus</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+document.getElementById('search-box').addEventListener('input', renderTable);
+document.getElementById('filter-status').addEventListener('change', renderTable);
+document.getElementById('filter-jabatan').addEventListener('change', renderTable);
+
+function viewDetail(id){
+  const r = NASABAH.find(n=>n.id===id); if(!r) return;
+  const d = computeDerived(r);
+  document.getElementById('modal-body').innerHTML = `
+    <h2>${r.nama}</h2>
+    <span class="status-pill status-${r.status||'PROSES'}">${r.status||'PROSES'}</span>
+    <div class="detail-grid">
+      <div class="row2"><span class="k">NIK</span><span>${r.nik||'-'}</span></div>
+      <div class="row2"><span class="k">NPWP</span><span>${r.npwp||'-'}</span></div>
+      <div class="row2"><span class="k">Tempat/Tgl Lahir</span><span>${r.tempat_lahir||'-'}, ${fmtDate(r.tgl_lahir)}</span></div>
+      <div class="row2"><span class="k">No HP</span><span>${r.hp||'-'}</span></div>
+      <div class="row2"><span class="k">Alamat</span><span>${r.alamat||'-'} RT${r.rt||'-'}/RW${r.rw||'-'}, ${r.kelurahan||'-'}, ${r.kecamatan||'-'}</span></div>
+      <div class="row2"><span class="k">Jabatan</span><span>${r.jabatan||'-'}</span></div>
+      <div class="row2"><span class="k">Instansi</span><span>${r.instansi||'-'}</span></div>
+      <div class="row2"><span class="k">NIP</span><span>${r.nip||'-'}</span></div>
+      <div class="row2"><span class="k">TMT</span><span>${fmtDate(r.tmt)}</span></div>
+      <div class="row2"><span class="k">Jenis Permohonan</span><span>${r.jenis||'-'}</span></div>
+      <div class="row2"><span class="k">Gaji Bersih</span><span>${rp(Number(r.gaji))}</span></div>
+      <div class="row2"><span class="k">RPC</span><span>${Math.round(d.rpc*100)}%</span></div>
+      <div class="row2"><span class="k">Usia Sekarang</span><span>${d.usiaSekarang!=null?num(d.usiaSekarang,1)+' th':'-'}</span></div>
+      <div class="row2"><span class="k">Usia Maks Pensiun</span><span>${d.usiaPensiun} th (est. pensiun ${d.tglPensiunEst?fmtDate(d.tglPensiunEst.toISOString().slice(0,10)):'-'})</span></div>
+      <div class="row2"><span class="k">Masa Kerja</span><span>${d.masaKerjaBulan!=null?d.masaKerjaBulan+' bln':'-'}</span></div>
+      <div class="row2"><span class="k">Sisa Masa Aktif</span><span>${d.sisaMasaAktifBulan!=null?d.sisaMasaAktifBulan+' bln':'-'}</span></div>
+      <div class="row2"><span class="k">Maks Jangka Waktu (SOP)</span><span>${d.maxJangkaWaktuSOP} bln</span></div>
+      <div class="row2"><span class="k">Plafond Diminta</span><span>${rp(Number(r.plafond))}</span></div>
+      <div class="row2"><span class="k">Maks Plafond (estimasi)</span><span>${rp(d.maxPlafond)} <span class="flag ${d.layak?'ok':'bad'}">${d.layak?'LAYAK':'MELEBIHI'}</span></span></div>
+      <div class="row2"><span class="k">Jangka Waktu Diminta</span><span>${r.jkw||'-'} bln</span></div>
+      <div class="row2"><span class="k">Estimasi Angsuran/bln</span><span>${rp(d.angsuran)}</span></div>
+      <div class="row2"><span class="k">Biaya Admin</span><span>${rp(d.biayaAdmin)}</span></div>
+      <div class="row2"><span class="k">Biaya Provisi</span><span>${rp(d.biayaProvisi)}</span></div>
+      <div class="row2"><span class="k">Analis / Marketing</span><span>${r.analis||'-'} / ${r.marketing||'-'}</span></div>
+      <div class="row2" style="grid-column:1/-1"><span class="k">Catatan</span><span>${r.catatan||'-'}</span></div>
+    </div>
+  `;
+  document.getElementById('detail-modal').classList.add('open');
+}
+document.getElementById('close-modal').addEventListener('click', ()=>document.getElementById('detail-modal').classList.remove('open'));
+document.getElementById('detail-modal').addEventListener('click', (e)=>{ if(e.target.id==='detail-modal') e.currentTarget.classList.remove('open'); });
+
+function editRecord(id){
+  const r = NASABAH.find(n=>n.id===id); if(!r) return;
+  editingId = id;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelector('.tab-btn[data-tab="input"]').classList.add('active');
+  document.getElementById('view-input').classList.add('active');
+  const map = {nama:'f-nama',jk:'f-jk',tempat_lahir:'f-tempat_lahir',tgl_lahir:'f-tgl_lahir',nik:'f-nik',npwp:'f-npwp',
+    hp:'f-hp',ibu:'f-ibu',pendidikan:'f-pendidikan',tanggungan:'f-tanggungan',pasangan:'f-pasangan',alamat:'f-alamat',
+    rt:'f-rt',rw:'f-rw',kelurahan:'f-kelurahan',kecamatan:'f-kecamatan',kota:'f-kota',jabatan:'f-jabatan',instansi:'f-instansi',
+    nip:'f-nip',tmt:'f-tmt',jenis:'f-jenis',gaji:'f-gaji',tanggal:'f-tanggal',plafond:'f-plafond',jkw:'f-jkw',
+    analis:'f-analis',marketing:'f-marketing',status:'f-status',catatan:'f-catatan'};
+  Object.entries(map).forEach(([k,elId])=>{ document.getElementById(elId).value = r[k]||''; });
+  document.getElementById('btn-submit').textContent = 'Update Data Nasabah';
+  updateCalcPreview();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+async function deleteRecord(id){
+  if(!confirm('Hapus data nasabah ini? Tindakan tidak bisa dibatalkan.')) return;
+  NASABAH = NASABAH.filter(n=>n.id!==id);
+  await saveData();
+  renderTable();
+  renderDashboard();
+}
+
+document.getElementById('btn-export').addEventListener('click', ()=>{
+  const headers = ['Nama','Jabatan','Instansi','NIP','Gaji Bersih','Plafond Diminta','Maks Plafond','Jangka Waktu','Angsuran','Status','Analis','Marketing'];
+  const rows = NASABAH.map(r=>{
+    const d = computeDerived(r);
+    return [r.nama,r.jabatan,r.instansi,r.nip,r.gaji,r.plafond,Math.round(d.maxPlafond),r.jkw,Math.round(d.angsuran),r.status,r.analis,r.marketing];
+  });
+  let csv = headers.join(';')+'\n'+rows.map(r=>r.map(v=>`"${(v??'').toString().replace(/"/g,'""')}"`).join(';')).join('\n');
+  const blob = new Blob(["\ufeff"+csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'data_nasabah_kmg_sidoarjo.csv';
+  a.click();
+});
+
+/* ============ DASHBOARD ============ */
+function renderDashboard(){
+  const total = NASABAH.length;
+  const totalPlafond = NASABAH.reduce((s,r)=>s+(Number(r.plafond)||0),0);
+  const totalCair = NASABAH.filter(r=>r.status==='CAIR').reduce((s,r)=>s+(Number(r.plafond)||0),0);
+  const proses = NASABAH.filter(r=>r.status==='PROSES'||!r.status).length;
+  const overLimit = NASABAH.filter(r=>{ const d=computeDerived(r); return r.plafond && !d.layak; }).length;
+
+  document.getElementById('dash-cards').innerHTML = `
+    <div class="card"><h3>Total Nasabah</h3><div class="val">${total}</div><div class="sub">seluruh status</div></div>
+    <div class="card"><h3>Total Plafond Diajukan</h3><div class="val" style="font-size:18px;">${rp(totalPlafond)}</div></div>
+    <div class="card"><h3>Total Plafond Cair</h3><div class="val" style="font-size:18px;">${rp(totalCair)}</div></div>
+    <div class="card"><h3>Dalam Proses</h3><div class="val">${proses}</div></div>
+    <div class="card"><h3>Perlu Ditinjau</h3><div class="val" style="color:${overLimit>0?'#b3261e':'#1a7f4b'}">${overLimit}</div><div class="sub">plafond melebihi maks. estimasi</div></div>
+  `;
+
+  document.getElementById('dash-banner').innerHTML = overLimit>0
+    ? `<div class="warn-banner">&#9888;&#65039; Ada ${overLimit} pengajuan dengan plafond melebihi estimasi maksimal &mdash; cek tab Data Nasabah.</div>`
+    : '';
+
+  const statusCounts = {PROSES:0,DISETUJUI:0,CAIR:0,DITOLAK:0};
+  NASABAH.forEach(r=>{ const s=r.status||'PROSES'; if(statusCounts[s]!=null) statusCounts[s]++; });
+  const maxS = Math.max(1,...Object.values(statusCounts));
+  document.getElementById('dash-status-bars').innerHTML = Object.entries(statusCounts).map(([k,v])=>`
+    <div class="bar-row"><span>${k}</span><div class="bar-track"><div class="bar-fill" style="width:${(v/maxS*100)}%"></div></div><span>${v}</span></div>
+  `).join('');
+
+  const instansiCounts = {};
+  NASABAH.forEach(r=>{ const k=r.instansi||'(kosong)'; instansiCounts[k]=(instansiCounts[k]||0)+1; });
+  const topInstansi = Object.entries(instansiCounts).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const maxI = Math.max(1,...topInstansi.map(x=>x[1]));
+  document.getElementById('dash-instansi-bars').innerHTML = topInstansi.length ? topInstansi.map(([k,v])=>`
+    <div class="bar-row"><span title="${k}" style="overflow:hidden;text-overflow:ellipsis;">${k}</span><div class="bar-track"><div class="bar-fill" style="width:${(v/maxI*100)}%"></div></div><span>${v}</span></div>
+  `).join('') : '<div class="empty">Belum ada data.</div>';
+
+  const recent = [...NASABAH].sort((a,b)=> new Date(b.createdAt||b.tanggal||0) - new Date(a.createdAt||a.tanggal||0)).slice(0,8);
+  document.getElementById('dash-recent').innerHTML = recent.length ? recent.map(r=>{
+    const d = computeDerived(r);
+    return `<tr><td>${r.nama||'-'}</td><td>${r.jabatan||'-'}</td><td>${r.instansi||'-'}</td><td>${rp(Number(r.plafond))}</td>
+      <td><span class="status-pill status-${r.status||'PROSES'}">${r.status||'PROSES'}</span></td><td>${fmtDate(r.tanggal)}</td></tr>`;
+  }).join('') : `<tr><td colspan="6" class="empty">Belum ada data.</td></tr>`;
+}
+
+/* ============ DOKUMEN GENERATOR ============ */
+function populateDocSelect(){
+  const sel = document.getElementById('doc-nasabah');
+  sel.innerHTML = '<option value="">-- pilih nasabah --</option>' +
+    NASABAH.map(r=>`<option value="${r.id}">${r.nama} - ${r.jabatan||''}</option>`).join('');
+}
+function terbilangSimple(n){
+  // fallback: just format number, full terbilang generation omitted for reliability
+  return rp(n);
+}
+document.getElementById('btn-gen-doc').addEventListener('click', ()=>{
+  const id = document.getElementById('doc-nasabah').value;
+  const jenis = document.getElementById('doc-jenis').value;
+  const out = document.getElementById('doc-output');
+  if(!id){ alert('Pilih nasabah terlebih dahulu.'); return; }
+  const r = NASABAH.find(n=>n.id===id);
+  const d = computeDerived(r);
+  const today = fmtDate(new Date().toISOString().slice(0,10));
+  const head = `
+    <div class="doc-head">
+      <div class="bankname">PT BANK PEMBANGUNAN DAERAH JAWA TIMUR Tbk</div>
+      <div class="addr">Kantor Cabang Sidoarjo &middot; Jalan A Yani No. 29 Sidoarjo</div>
+    </div>`;
+  const footerSign = `
+    <div class="sign-block">
+      <div class="box">Pemohon,<div class="sign-space"></div><strong>${r.nama||''}</strong></div>
+      <div class="box">Sidoarjo, ${today}<br/>${SETTINGS.pincaJabatan},<div class="sign-space"></div><strong>${SETTINGS.pincaNama}</strong></div>
+    </div>`;
+
+  let body = '';
+  if(jenis==='sppk'){
+    body = `
+      ${head}
+      <h3>SURAT PENEGASAN PERSETUJUAN KREDIT (SPPK)</h3>
+      <div class="doc-sub">Kredit Multiguna (KMG)</div>
+      <p>Sehubungan dengan permohonan Kredit Multiguna yang Saudara/i ajukan, dengan ini kami sampaikan bahwa permohonan kredit
+      atas nama tersebut di bawah ini telah <strong>${(r.status==='DISETUJUI'||r.status==='CAIR')?'DISETUJUI':'DALAM PROSES PERSETUJUAN'}</strong>
+      dengan syarat dan ketentuan sebagai berikut:</p>
+      <table class="doc-table">
+        <tr><td class="k">Nama Debitur</td><td>: ${r.nama||'-'}</td></tr>
+        <tr><td class="k">NIP</td><td>: ${r.nip||'-'}</td></tr>
+        <tr><td class="k">Instansi</td><td>: ${r.instansi||'-'}</td></tr>
+        <tr><td class="k">Jabatan / Status</td><td>: ${r.jabatan||'-'}</td></tr>
+        <tr><td class="k">Jenis Permohonan</td><td>: ${r.jenis||'-'}</td></tr>
+        <tr><td class="k">Plafond Kredit Disetujui</td><td>: ${rp(Number(r.plafond))}</td></tr>
+        <tr><td class="k">Jangka Waktu</td><td>: ${r.jkw||'-'} bulan</td></tr>
+        <tr><td class="k">Suku Bunga</td><td>: ${num(d.sukuBunga,2)}% per tahun (efektif)</td></tr>
+        <tr><td class="k">Angsuran per Bulan</td><td>: ${rp(d.angsuran)}</td></tr>
+        <tr><td class="k">Biaya Provisi</td><td>: ${rp(d.biayaProvisi)}</td></tr>
+        <tr><td class="k">Biaya Administrasi</td><td>: ${rp(d.biayaAdmin)}</td></tr>
+      </table>
+      <p>SPPK ini berlaku selama 14 (empat belas) hari kalender sejak tanggal diterbitkan. Apabila dalam jangka waktu tersebut
+      Saudara/i tidak menandatangani Perjanjian Kredit, maka SPPK ini dinyatakan batal demi hukum.</p>
+      ${footerSign}
+    `;
+  } else if(jenis==='kuasa'){
+    body = `
+      ${head}
+      <h3>SURAT KUASA</h3>
+      <div class="doc-sub">Memotong Gaji / Penghasilan untuk Pembayaran Angsuran Kredit Multiguna</div>
+      <p>Yang bertanda tangan di bawah ini:</p>
+      <table class="doc-table">
+        <tr><td class="k">Nama</td><td>: ${r.nama||'-'}</td></tr>
+        <tr><td class="k">NIP</td><td>: ${r.nip||'-'}</td></tr>
+        <tr><td class="k">Jabatan</td><td>: ${r.jabatan||'-'}</td></tr>
+        <tr><td class="k">Instansi</td><td>: ${r.instansi||'-'}</td></tr>
+        <tr><td class="k">Alamat</td><td>: ${r.alamat||'-'} RT ${r.rt||'-'} RW ${r.rw||'-'}, ${r.kelurahan||'-'}, ${r.kecamatan||'-'}</td></tr>
+      </table>
+      <p>selanjutnya disebut <strong>Pemberi Kuasa</strong>, dengan ini memberi kuasa kepada Bendahara/Pejabat yang berwenang pada
+      instansi tempat Pemberi Kuasa bekerja untuk memotong gaji/penghasilan Pemberi Kuasa setiap bulan sebesar
+      <strong>${rp(d.angsuran)}</strong> (${terbilangSimple(d.angsuran)}) guna pembayaran angsuran Kredit Multiguna pada
+      PT Bank Pembangunan Daerah Jawa Timur Tbk Cabang Sidoarjo, dengan plafond kredit sebesar ${rp(Number(r.plafond))} dan
+      jangka waktu ${r.jkw||'-'} bulan, sampai dengan kredit dimaksud lunas.</p>
+      <p>Surat kuasa ini tidak dapat ditarik kembali atau dibatalkan secara sepihak selama kewajiban kredit belum lunas.</p>
+      ${footerSign}
+    `;
+  } else if(jenis==='pernyataan'){
+    body = `
+      ${head}
+      <h3>SURAT PERNYATAAN</h3>
+      <div class="doc-sub">Pemohon Kredit Multiguna</div>
+      <p>Yang bertanda tangan di bawah ini:</p>
+      <table class="doc-table">
+        <tr><td class="k">Nama</td><td>: ${r.nama||'-'}</td></tr>
+        <tr><td class="k">Tempat/Tgl Lahir</td><td>: ${r.tempat_lahir||'-'}, ${fmtDate(r.tgl_lahir)}</td></tr>
+        <tr><td class="k">NIK</td><td>: ${r.nik||'-'}</td></tr>
+        <tr><td class="k">NIP</td><td>: ${r.nip||'-'}</td></tr>
+        <tr><td class="k">Alamat</td><td>: ${r.alamat||'-'} RT ${r.rt||'-'} RW ${r.rw||'-'}, ${r.kelurahan||'-'}, ${r.kecamatan||'-'}</td></tr>
+      </table>
+      <p>dengan ini menyatakan dengan sebenarnya bahwa:</p>
+      <ol>
+        <li>Data dan dokumen yang saya sampaikan dalam rangka permohonan Kredit Multiguna kepada PT Bank Pembangunan Daerah
+        Jawa Timur Tbk Cabang Sidoarjo adalah benar dan dapat dipertanggungjawabkan;</li>
+        <li>Saya bersedia untuk membayar angsuran sebesar ${rp(d.angsuran)} setiap bulan sampai dengan kredit lunas;</li>
+        <li>Apabila di kemudian hari ditemukan data yang tidak benar, saya bersedia menerima segala konsekuensi hukum yang berlaku,
+        termasuk pembatalan persetujuan kredit;</li>
+        <li>Saya tidak sedang memiliki tunggakan kredit bermasalah pada bank/lembaga keuangan lain yang saya sembunyikan.</li>
+      </ol>
+      <p>Demikian surat pernyataan ini saya buat dengan sesungguhnya, tanpa paksaan dari pihak manapun, untuk dipergunakan sebagaimana mestinya.</p>
+      ${footerSign}
+    `;
+  } else if(jenis==='memo'){
+    body = `
+      ${head}
+      <h3>MEMO PENCAIRAN KREDIT</h3>
+      <div class="doc-sub">Kredit Multiguna (KMG)</div>
+      <table class="doc-table">
+        <tr><td class="k">Kepada</td><td>: Bagian Operasional / Loan Admin</td></tr>
+        <tr><td class="k">Dari</td><td>: ${r.analis||SETTINGS.analisDefault||'Analis Kredit'} (Analis) / ${r.marketing||'-'} (Marketing)</td></tr>
+        <tr><td class="k">Perihal</td><td>: Permohonan Pencairan Kredit Multiguna a.n. ${r.nama||'-'}</td></tr>
+      </table>
+      <p>Dengan ini kami mohon agar dapat dilakukan pencairan kredit untuk debitur dengan data sebagai berikut:</p>
+      <table class="doc-table">
+        <tr><td class="k">Nama Debitur</td><td>: ${r.nama||'-'}</td></tr>
+        <tr><td class="k">No. Rekening</td><td>: ${r.no_rekening||'........................'}</td></tr>
+        <tr><td class="k">Instansi</td><td>: ${r.instansi||'-'}</td></tr>
+        <tr><td class="k">Jenis Permohonan</td><td>: ${r.jenis||'-'}</td></tr>
+        <tr><td class="k">Plafond Kredit</td><td>: ${rp(Number(r.plafond))}</td></tr>
+        <tr><td class="k">Jangka Waktu</td><td>: ${r.jkw||'-'} bulan</td></tr>
+        <tr><td class="k">Biaya Provisi</td><td>: ${rp(d.biayaProvisi)}</td></tr>
+        <tr><td class="k">Biaya Administrasi</td><td>: ${rp(d.biayaAdmin)}</td></tr>
+        <tr><td class="k">Dana Diterima Bersih (estimasi)</td><td>: ${rp(Number(r.plafond) - d.biayaProvisi - d.biayaAdmin)}</td></tr>
+      </table>
+      <p>Seluruh dokumen persyaratan (KTP, SK, Surat Kuasa Potong Gaji, Surat Pernyataan, SPPK) telah dilengkapi dan diverifikasi
+      sesuai ketentuan yang berlaku.</p>
+      ${footerSign}
+    `;
+  }
+
+  out.innerHTML = `<div class="doc-page">${body}</div>`;
+  document.getElementById('btn-print-doc').disabled = false;
+});
+document.getElementById('btn-print-doc').addEventListener('click', ()=> window.print());
+
+/* ============ SETTINGS ============ */
+function loadSettingsForm(){
+  document.getElementById('s-pinca-nama').value = SETTINGS.pincaNama;
+  document.getElementById('s-pinca-jabatan').value = SETTINGS.pincaJabatan;
+  document.getElementById('s-analis-default').value = SETTINGS.analisDefault;
+  document.getElementById('s-suku-bunga').value = SETTINGS.sukuBunga;
+  document.getElementById('s-provisi').value = SETTINGS.provisi;
+}
+document.getElementById('btn-save-settings').addEventListener('click', async ()=>{
+  SETTINGS.pincaNama = document.getElementById('s-pinca-nama').value;
+  SETTINGS.pincaJabatan = document.getElementById('s-pinca-jabatan').value;
+  SETTINGS.analisDefault = document.getElementById('s-analis-default').value;
+  SETTINGS.sukuBunga = Number(document.getElementById('s-suku-bunga').value)||12;
+  SETTINGS.provisi = Number(document.getElementById('s-provisi').value)||1;
+  await saveSettings();
+  alert('Pengaturan tersimpan untuk seluruh pengguna.');
+  renderTable(); renderDashboard();
+});
+document.getElementById('btn-reset-data').addEventListener('click', async ()=>{
+  if(!confirm('Ini akan mengganti SELURUH data nasabah saat ini dengan 39 data awal dari Excel. Lanjutkan?')) return;
+  NASABAH = SEED_RECORDS.map(r=>({...r}));
+  await saveData();
+  renderTable(); renderDashboard();
+  alert('Data berhasil direset ke 39 data awal.');
+});
+
+/* ============ CLOCK ============ */
+function tickClock(){
+  document.getElementById('clock').textContent = new Date().toLocaleString('id-ID',{dateStyle:'full', timeStyle:'short'});
+}
+setInterval(tickClock, 1000*30);
+
+/* ============ INIT ============ */
+(async function init(){
+  tickClock();
+  document.getElementById('storage-mode-badge').innerHTML = USE_SHEETS
+    ? '&#9989; Tersambung ke Google Sheets &middot; data bersama untuk semua pengguna'
+    : '&#9888;&#65039; Mode lokal (Claude storage) &middot; isi SHEET_API_URL untuk pakai Google Sheets';
+  initStaticDropdowns();
+  await loadData();
+  document.getElementById('f-tanggal').value = new Date().toISOString().slice(0,10);
+  loadSettingsForm();
+  renderDashboard();
+  renderTable();
+  populateDocSelect();
+  updateCalcPreview();
+})();
+</script>
+</body>
+</html>
