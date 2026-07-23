@@ -376,67 +376,93 @@ let editingId = null;
 
 /* ============ STORAGE HELPERS ============
    Dual mode:
-   1) Jika SHEET_API_URL diisi (URL Web App Google Apps Script) -> pakai Google Sheets sebagai
-      database bersama, bisa diakses dari mana saja termasuk saat di-hosting di luar Claude.
-   2) Jika dikosongkan -> otomatis pakai penyimpanan bawaan artifact Claude (window.storage),
-      supaya tetap bisa dicoba langsung di sini sebelum di-deploy ke hosting sendiri.
-
-   CARA ISI: deploy Google Apps Script (lihat file AppsScript_Code.gs yang menyertai aplikasi ini),
-   copy "Web app URL"-nya, lalu tempel di antara tanda kutip di bawah ini. */
-const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxHgIR9AVjJdz2moWFX7AtPLQMJCZMm-Q0Z76Ne3ywuQhbJ32KnTvgTnhM2DNoXx1Xc-Q/exec"; // <-- contoh: "https://script.google.com/macros/s/AKfycb.../exec"
+   1) Jika SHEET_API_URL diisi (URL Web App Google Apps Script v2) -> pakai Google Sheets sebagai
+      database bersama, dengan data tersimpan sebagai KOLOM ASLI di sheet "Nasabah" (bisa dibuka
+      & difilter langsung dari Google Sheets). Bisa diakses dari mana saja, termasuk saat
+      di-hosting di luar Claude (mis. GitHub Pages).
+   2) Jika dikosongkan -> otomatis pakai penyimpanan bawaan artifact Claude (window.storage). */
+const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbw06Dnrym92-eSpspluwZe5Ye1aIjy3e4-_3eUoWV22SDVKEi4BkNS0Yt67t0MpElh1bg/exec";
 
 const USE_SHEETS = SHEET_API_URL && SHEET_API_URL.trim().length > 0;
 
-async function sheetGet(key){
-  const res = await fetch(SHEET_API_URL + '?key=' + encodeURIComponent(key));
+/* --- panggilan mentah ke Apps Script --- */
+async function apiList(){
+  const res = await fetch(SHEET_API_URL + '?action=list');
   const data = await res.json();
-  return data.value;
+  if(data.error) throw new Error(data.error);
+  return data.records || [];
 }
-async function sheetSet(key, value){
+async function apiSettings(){
+  const res = await fetch(SHEET_API_URL + '?action=settings');
+  const data = await res.json();
+  if(data.error) throw new Error(data.error);
+  return data.settings || {};
+}
+async function apiPost(payload){
+  // mode 'no-cors': request tetap terkirim & diproses server meski responsenya tidak bisa
+  // dibaca balik oleh browser (batasan CORS bawaan Google Apps Script Web App).
   await fetch(SHEET_API_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // hindari CORS preflight
-    body: JSON.stringify({ key, value })
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload)
   });
+}
+
+/* --- lapisan abstraksi: dipakai oleh seluruh UI, otomatis pilih Sheets atau storage lokal --- */
+async function refreshFromServer(){
+  if(USE_SHEETS){
+    const records = await apiList();
+    const settings = await apiSettings();
+    NASABAH = records;
+    if(settings && Object.keys(settings).length) SETTINGS = {...DEFAULT_SETTINGS, ...settings};
+  }else{
+    const res = await window.storage.get('kmg-nasabah-list', true);
+    NASABAH = res ? JSON.parse(res.value) : [];
+    const res2 = await window.storage.get('kmg-settings', true);
+    if(res2) SETTINGS = {...DEFAULT_SETTINGS, ...JSON.parse(res2.value)};
+  }
+}
+async function persistUpsert(rec){
+  if(USE_SHEETS){ await apiPost({action:'upsert', record: rec}); }
+  else{
+    const idx = NASABAH.findIndex(n=>n.id===rec.id);
+    if(idx>-1) NASABAH[idx] = rec; else NASABAH.push(rec);
+    await window.storage.set('kmg-nasabah-list', JSON.stringify(NASABAH), true);
+  }
+}
+async function persistDelete(id){
+  if(USE_SHEETS){ await apiPost({action:'delete', id}); }
+  else{
+    NASABAH = NASABAH.filter(n=>n.id!==id);
+    await window.storage.set('kmg-nasabah-list', JSON.stringify(NASABAH), true);
+  }
+}
+async function persistBulkImport(records){
+  if(USE_SHEETS){ await apiPost({action:'bulkImport', records}); }
+  else{
+    NASABAH = records;
+    await window.storage.set('kmg-nasabah-list', JSON.stringify(NASABAH), true);
+  }
+}
+async function persistSaveSettings(settingsObj){
+  if(USE_SHEETS){ await apiPost({action:'saveSettings', settings: settingsObj}); }
+  else{
+    await window.storage.set('kmg-settings', JSON.stringify(settingsObj), true);
+  }
 }
 
 async function loadData(){
   try{
-    let raw;
-    if(USE_SHEETS){
-      raw = await sheetGet('kmg-nasabah-list');
-    }else{
-      const res = await window.storage.get('kmg-nasabah-list', true);
-      raw = res ? res.value : null;
-    }
-    NASABAH = raw ? JSON.parse(raw) : null;
-  }catch(e){ console.error('Gagal memuat data nasabah:', e); NASABAH = null; }
+    await refreshFromServer();
+  }catch(e){
+    console.error('Gagal memuat data dari server:', e);
+    NASABAH = [];
+  }
   if(!NASABAH || !NASABAH.length){
     NASABAH = SEED_RECORDS.map(r => ({...r}));
-    await saveData();
+    try{ await persistBulkImport(NASABAH); }catch(e){ console.error('Gagal import data awal:', e); }
   }
-  try{
-    let rawSettings;
-    if(USE_SHEETS){
-      rawSettings = await sheetGet('kmg-settings');
-    }else{
-      const res2 = await window.storage.get('kmg-settings', true);
-      rawSettings = res2 ? res2.value : null;
-    }
-    if(rawSettings) SETTINGS = {...DEFAULT_SETTINGS, ...JSON.parse(rawSettings)};
-  }catch(e){ console.error('Gagal memuat pengaturan:', e); }
-}
-async function saveData(){
-  try{
-    if(USE_SHEETS) await sheetSet('kmg-nasabah-list', JSON.stringify(NASABAH));
-    else await window.storage.set('kmg-nasabah-list', JSON.stringify(NASABAH), true);
-  }catch(e){ console.error('Gagal menyimpan data nasabah:', e); alert('Gagal menyimpan data. Cek koneksi / URL Google Sheets API.'); }
-}
-async function saveSettings(){
-  try{
-    if(USE_SHEETS) await sheetSet('kmg-settings', JSON.stringify(SETTINGS));
-    else await window.storage.set('kmg-settings', JSON.stringify(SETTINGS), true);
-  }catch(e){ console.error('Gagal menyimpan pengaturan:', e); }
 }
 
 /* ============ FORMULA / CALC ENGINE ============
@@ -629,22 +655,35 @@ document.getElementById('form-nasabah').addEventListener('submit', async (e)=>{
   e.preventDefault();
   const rec = readForm();
   if(editingId){
-    const idx = NASABAH.findIndex(n=>n.id===editingId);
-    if(idx>-1) NASABAH[idx] = {...NASABAH[idx], ...rec};
-    editingId = null;
-    document.getElementById('btn-submit').textContent = 'Simpan Nasabah';
+    const old = NASABAH.find(n=>n.id===editingId);
+    rec.id = editingId;
+    rec.createdAt = old ? old.createdAt : new Date().toISOString();
   }else{
     rec.id = uid();
     rec.createdAt = new Date().toISOString();
-    NASABAH.push(rec);
   }
-  await saveData();
-  document.getElementById('form-nasabah').reset();
-  document.getElementById('f-kota').value='SIDOARJO';
-  updateCalcPreview();
-  alert('Data nasabah tersimpan.');
-  renderTable();
-  renderDashboard();
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true; btn.textContent = 'Menyimpan...';
+  try{
+    await persistUpsert(rec);
+    await refreshFromServer();
+    const found = NASABAH.find(n=>n.id===rec.id);
+    editingId = null;
+    document.getElementById('form-nasabah').reset();
+    document.getElementById('f-kota').value='SIDOARJO';
+    updateCalcPreview();
+    if(found){
+      alert('Data nasabah tersimpan.');
+    }else{
+      alert('Peringatan: data mungkin belum tersimpan di server (Google Sheets). Cek koneksi internet / URL API di pengaturan, lalu coba lagi.');
+    }
+    renderTable();
+    renderDashboard();
+  }catch(err){
+    alert('Gagal menyimpan data: ' + err.message);
+  }finally{
+    btn.disabled = false; btn.textContent = 'Simpan Nasabah';
+  }
 });
 document.getElementById('btn-reset').addEventListener('click', ()=>{
   document.getElementById('form-nasabah').reset();
@@ -758,10 +797,17 @@ function editRecord(id){
 }
 async function deleteRecord(id){
   if(!confirm('Hapus data nasabah ini? Tindakan tidak bisa dibatalkan.')) return;
-  NASABAH = NASABAH.filter(n=>n.id!==id);
-  await saveData();
-  renderTable();
-  renderDashboard();
+  try{
+    await persistDelete(id);
+    await refreshFromServer();
+    if(NASABAH.find(n=>n.id===id)){
+      alert('Peringatan: data mungkin belum terhapus di server. Cek koneksi lalu coba lagi.');
+    }
+    renderTable();
+    renderDashboard();
+  }catch(e){
+    alert('Gagal menghapus data: ' + e.message);
+  }
 }
 
 document.getElementById('btn-export').addEventListener('click', ()=>{
@@ -969,16 +1015,24 @@ document.getElementById('btn-save-settings').addEventListener('click', async ()=
   SETTINGS.analisDefault = document.getElementById('s-analis-default').value;
   SETTINGS.sukuBunga = Number(document.getElementById('s-suku-bunga').value)||12;
   SETTINGS.provisi = Number(document.getElementById('s-provisi').value)||1;
-  await saveSettings();
-  alert('Pengaturan tersimpan untuk seluruh pengguna.');
-  renderTable(); renderDashboard();
+  try{
+    await persistSaveSettings(SETTINGS);
+    alert('Pengaturan tersimpan untuk seluruh pengguna.');
+    renderTable(); renderDashboard();
+  }catch(e){
+    alert('Gagal menyimpan pengaturan: ' + e.message);
+  }
 });
 document.getElementById('btn-reset-data').addEventListener('click', async ()=>{
   if(!confirm('Ini akan mengganti SELURUH data nasabah saat ini dengan 39 data awal dari Excel. Lanjutkan?')) return;
-  NASABAH = SEED_RECORDS.map(r=>({...r}));
-  await saveData();
-  renderTable(); renderDashboard();
-  alert('Data berhasil direset ke 39 data awal.');
+  try{
+    await persistBulkImport(SEED_RECORDS.map(r=>({...r})));
+    await refreshFromServer();
+    renderTable(); renderDashboard();
+    alert('Data berhasil direset ke 39 data awal.');
+  }catch(e){
+    alert('Gagal reset data: ' + e.message);
+  }
 });
 
 /* ============ CLOCK ============ */
